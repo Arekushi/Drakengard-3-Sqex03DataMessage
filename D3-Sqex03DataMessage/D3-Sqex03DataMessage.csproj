@@ -53,6 +53,7 @@
     <Compile Include="BinaryReaderBE.cs" />
     <Compile Include="CompressedChunk.cs" />
     <Compile Include="DataMessage.cs" />
+    <Compile Include="FolderBrowser.cs" />
     <Compile Include="MainUI.cs">
       <SubType>Form</SubType>
     </Compile>

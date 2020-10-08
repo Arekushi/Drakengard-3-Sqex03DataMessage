@@ -55,14 +55,9 @@ namespace D3_Sqex03DataMessage
 
         private void btnSelectGameLocation_Click(object sender, EventArgs e)
         {
-            OpenFileDialog folderBrowser = new OpenFileDialog();
-            folderBrowser.ValidateNames = false;
-            folderBrowser.CheckFileExists = false;
-            folderBrowser.CheckPathExists = true;
-            folderBrowser.FileName = "BLUS31197";
-            if (folderBrowser.ShowDialog() == DialogResult.OK)
+            string folderPath = FolderBrowser.FolderBrowserDialog("BLUS31197");
+            if (!string.IsNullOrEmpty(folderPath))
             {
-                string folderPath = Path.GetDirectoryName(folderBrowser.FileName);
                 txtBoxGameLocation.Text = folderPath;
                 if (_JsonConfig.ContainsKey("GameLocation"))
                 {
@@ -76,7 +71,7 @@ namespace D3_Sqex03DataMessage
                 try
                 {
                     File.WriteAllText(_ConfigFile, configStr);
-                } 
+                }
                 catch (Exception err)
                 {
                     MessageBox.Show($"An error occurred:\n\n{err.Message}");
