@@ -1,3 +1,3 @@
-# .NET Drakengard 3 Sqex03DataMessage
+# Drakengard 3 Sqex03DataMessage
 
 Initialization

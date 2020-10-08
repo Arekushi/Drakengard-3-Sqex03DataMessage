@@ -29,11 +29,8 @@
         private void InitializeComponent()
         {
             this.btnSelectOriginalFiles = new System.Windows.Forms.Button();
-            this.labelOriginalFiles = new System.Windows.Forms.Label();
-            this.txtBoxOriginalFiles = new System.Windows.Forms.TextBox();
-            this.labelWorkingDirectory = new System.Windows.Forms.Label();
-            this.btnSelectWorkingDirectory = new System.Windows.Forms.Button();
-            this.txtBoxWorkingDirectory = new System.Windows.Forms.TextBox();
+            this.labelGameLocation = new System.Windows.Forms.Label();
+            this.txtBoxGameLocation = new System.Windows.Forms.TextBox();
             this.btnOpen = new System.Windows.Forms.Button();
             this.btnPreview = new System.Windows.Forms.Button();
             this.btnReimport = new System.Windows.Forms.Button();
@@ -50,49 +47,24 @@
             this.btnSelectOriginalFiles.TabIndex = 0;
             this.btnSelectOriginalFiles.Text = "Select";
             this.btnSelectOriginalFiles.UseVisualStyleBackColor = true;
+            this.btnSelectOriginalFiles.Click += new System.EventHandler(this.btnSelectGameLocation_Click);
             // 
-            // labelOriginalFiles
+            // labelGameLocation
             // 
-            this.labelOriginalFiles.AutoSize = true;
-            this.labelOriginalFiles.Location = new System.Drawing.Point(12, 22);
-            this.labelOriginalFiles.Name = "labelOriginalFiles";
-            this.labelOriginalFiles.Size = new System.Drawing.Size(117, 13);
-            this.labelOriginalFiles.TabIndex = 1;
-            this.labelOriginalFiles.Text = "Original Files (Directory)";
+            this.labelGameLocation.AutoSize = true;
+            this.labelGameLocation.Location = new System.Drawing.Point(12, 22);
+            this.labelGameLocation.Name = "labelGameLocation";
+            this.labelGameLocation.Size = new System.Drawing.Size(79, 13);
+            this.labelGameLocation.TabIndex = 1;
+            this.labelGameLocation.Text = "Game Location";
             // 
-            // txtBoxOriginalFiles
+            // txtBoxGameLocation
             // 
-            this.txtBoxOriginalFiles.Location = new System.Drawing.Point(93, 43);
-            this.txtBoxOriginalFiles.Name = "txtBoxOriginalFiles";
-            this.txtBoxOriginalFiles.ReadOnly = true;
-            this.txtBoxOriginalFiles.Size = new System.Drawing.Size(379, 20);
-            this.txtBoxOriginalFiles.TabIndex = 2;
-            // 
-            // labelWorkingDirectory
-            // 
-            this.labelWorkingDirectory.AutoSize = true;
-            this.labelWorkingDirectory.Location = new System.Drawing.Point(12, 76);
-            this.labelWorkingDirectory.Name = "labelWorkingDirectory";
-            this.labelWorkingDirectory.Size = new System.Drawing.Size(92, 13);
-            this.labelWorkingDirectory.TabIndex = 3;
-            this.labelWorkingDirectory.Text = "Working Directory";
-            // 
-            // btnSelectWorkingDirectory
-            // 
-            this.btnSelectWorkingDirectory.Location = new System.Drawing.Point(12, 95);
-            this.btnSelectWorkingDirectory.Name = "btnSelectWorkingDirectory";
-            this.btnSelectWorkingDirectory.Size = new System.Drawing.Size(75, 23);
-            this.btnSelectWorkingDirectory.TabIndex = 4;
-            this.btnSelectWorkingDirectory.Text = "Select";
-            this.btnSelectWorkingDirectory.UseVisualStyleBackColor = true;
-            // 
-            // txtBoxWorkingDirectory
-            // 
-            this.txtBoxWorkingDirectory.Location = new System.Drawing.Point(93, 97);
-            this.txtBoxWorkingDirectory.Name = "txtBoxWorkingDirectory";
-            this.txtBoxWorkingDirectory.ReadOnly = true;
-            this.txtBoxWorkingDirectory.Size = new System.Drawing.Size(379, 20);
-            this.txtBoxWorkingDirectory.TabIndex = 5;
+            this.txtBoxGameLocation.Location = new System.Drawing.Point(93, 43);
+            this.txtBoxGameLocation.Name = "txtBoxGameLocation";
+            this.txtBoxGameLocation.ReadOnly = true;
+            this.txtBoxGameLocation.Size = new System.Drawing.Size(379, 20);
+            this.txtBoxGameLocation.TabIndex = 2;
             // 
             // btnOpen
             // 
@@ -156,11 +128,8 @@
             this.Controls.Add(this.btnReimport);
             this.Controls.Add(this.btnPreview);
             this.Controls.Add(this.btnOpen);
-            this.Controls.Add(this.txtBoxWorkingDirectory);
-            this.Controls.Add(this.btnSelectWorkingDirectory);
-            this.Controls.Add(this.labelWorkingDirectory);
-            this.Controls.Add(this.txtBoxOriginalFiles);
-            this.Controls.Add(this.labelOriginalFiles);
+            this.Controls.Add(this.txtBoxGameLocation);
+            this.Controls.Add(this.labelGameLocation);
             this.Controls.Add(this.btnSelectOriginalFiles);
             this.Name = "MainUI";
             this.Text = "Drakengard 3 - Sqex03DataMessage";
@@ -173,11 +142,8 @@
         #endregion
 
         private System.Windows.Forms.Button btnSelectOriginalFiles;
-        private System.Windows.Forms.Label labelOriginalFiles;
-        private System.Windows.Forms.TextBox txtBoxOriginalFiles;
-        private System.Windows.Forms.Label labelWorkingDirectory;
-        private System.Windows.Forms.Button btnSelectWorkingDirectory;
-        private System.Windows.Forms.TextBox txtBoxWorkingDirectory;
+        private System.Windows.Forms.Label labelGameLocation;
+        private System.Windows.Forms.TextBox txtBoxGameLocation;
         private System.Windows.Forms.Button btnOpen;
         private System.Windows.Forms.Button btnPreview;
         private System.Windows.Forms.Button btnReimport;
