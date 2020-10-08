@@ -3,21 +3,21 @@ using System.Collections.Generic;
 
 namespace D3_Sqex03DataMessage
 {
-    class ArchiveConfig
+    public static class ArchiveConfig
     {
-        public Dictionary<string, string> Replace { get; set; }
-        public string TOCName { get; set; }
-        public List<string> ArchiveName { get; set; }
-        public UInt32 Signature { get; set; }
-        public UInt32 UncompressedFlags { get; set; }
-        public byte[] UncompressedFlagsBytes { get; set; }
-        public long CompressionTypeOffset { get; set; }
-        public long PackageFlagsOffset { get; set; }
-        public long TableOffset { get; set; }
-        public long TableToData { get; set; }
-        public List<UInt32> Skip { get; set; }
+        public static Dictionary<string, string> Replace { get; set; }
+        public static string TOCName { get; set; }
+        public static List<string> ArchiveName { get; set; }
+        public static UInt32 Signature { get; set; }
+        public static UInt32 UncompressedFlags { get; set; }
+        public static byte[] UncompressedFlagsBytes { get; set; }
+        public static long CompressionTypeOffset { get; set; }
+        public static long PackageFlagsOffset { get; set; }
+        public static long TableOffset { get; set; }
+        public static long TableToData { get; set; }
+        public static List<UInt32> Skip { get; set; }
 
-        public ArchiveConfig()
+        public static void Initialization()
         {
             List<string> archive_name = new List<string>();
             archive_name.Add("ALLMESSAGE_SF.XXX");

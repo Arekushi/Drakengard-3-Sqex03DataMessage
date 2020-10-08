@@ -63,6 +63,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sqex03DataMessage.cs" />
+    <Compile Include="ViewUI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ViewUI.Designer.cs">
+      <DependentUpon>ViewUI.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="MainUI.resx">
       <DependentUpon>MainUI.cs</DependentUpon>
     </EmbeddedResource>
@@ -76,6 +82,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="ViewUI.resx">
+      <DependentUpon>ViewUI.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

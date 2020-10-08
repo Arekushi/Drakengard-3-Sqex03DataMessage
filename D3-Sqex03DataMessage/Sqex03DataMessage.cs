@@ -9,7 +9,7 @@ namespace D3_Sqex03DataMessage
 {
     class Sqex03DataMessage
     {
-        public static byte[] Decompress(byte[] input, ArchiveConfig config, uint offset)
+        public static byte[] Decompress(byte[] input, uint offset)
         {
             MemoryStream stream = new MemoryStream(input);
             BinaryReaderBE reader = new BinaryReaderBE(stream);
@@ -35,14 +35,14 @@ namespace D3_Sqex03DataMessage
             BinaryWriter writer = new BinaryWriter(result);
             long unknow_position = position;
             reader.BaseStream.Position = 0;
-            writer.Write(reader.ReadBytes((int)config.PackageFlagsOffset));
-            writer.Write(config.UncompressedFlagsBytes);
+            writer.Write(reader.ReadBytes((int)ArchiveConfig.PackageFlagsOffset));
+            writer.Write(ArchiveConfig.UncompressedFlagsBytes);
             reader.BaseStream.Position += 4;
-            writer.Write(reader.ReadBytes((int)(config.CompressionTypeOffset - config.PackageFlagsOffset - 4)));
+            writer.Write(reader.ReadBytes((int)(ArchiveConfig.CompressionTypeOffset - ArchiveConfig.PackageFlagsOffset - 4)));
             writer.Write(new byte[8]);
             reader.BaseStream.Position = unknow_position;
             writer.Write(reader.ReadBytes(8));
-            position = config.CompressionTypeOffset + 16;
+            position = ArchiveConfig.CompressionTypeOffset + 16;
             foreach (CompressedChunk chunk in total_chunk)
             {
                 if (chunk.Uncompressed_Offset > position)
@@ -59,19 +59,19 @@ namespace D3_Sqex03DataMessage
             return result.ToArray();
         }
 
-        public static List<DataMessage> Export(byte[] input, ArchiveConfig config)
+        public static List<DataMessage> Export(byte[] input)
         {
             List<DataMessage> result = new List<DataMessage>();
             MemoryStream stream = new MemoryStream(input);
             BinaryReaderBE reader = new BinaryReaderBE(stream);
-            if (reader.ReadUInt32() == config.Signature)
+            if (reader.ReadUInt32() == ArchiveConfig.Signature)
             {
-                reader.BaseStream.Position = config.CompressionTypeOffset;
+                reader.BaseStream.Position = ArchiveConfig.CompressionTypeOffset;
                 UInt32 compress_type = reader.ReadUInt32();
                 switch (compress_type)
                 {
                     case 0:
-                        reader.BaseStream.Position = config.TableOffset;
+                        reader.BaseStream.Position = ArchiveConfig.TableOffset;
 
                         UInt32 name_count = reader.ReadUInt32();
                         UInt32 name_offset = reader.ReadUInt32();
@@ -118,7 +118,7 @@ namespace D3_Sqex03DataMessage
                             {
                                 reader.BaseStream.Position = offset;
                                 UInt32 order = reader.ReadUInt32();
-                                if (config.Skip.Contains(order)) continue;
+                                if (ArchiveConfig.Skip.Contains(order)) continue;
                                 reader.BaseStream.Position += 68;
                                 UInt64 unknow_data_length = reader.ReadUInt64();
                                 reader.BaseStream.Position += (long)unknow_data_length + 16 + 8;
@@ -136,7 +136,7 @@ namespace D3_Sqex03DataMessage
                                     }
                                     
                                     string str = zero_bytes < 2 ? Encoding.UTF8.GetString(reader.ReadBytes((int)str_length - zero_bytes)) : Encoding.Unicode.GetString(reader.ReadBytes((int)str_length));
-                                    foreach (KeyValuePair<string, string> entry in config.Replace)
+                                    foreach (KeyValuePair<string, string> entry in ArchiveConfig.Replace)
                                     {
                                         str = str.Replace(entry.Key, entry.Value);
                                     }
@@ -149,8 +149,8 @@ namespace D3_Sqex03DataMessage
                         }
                         break;
                     case 1:
-                        byte[] decompressed_data = Decompress(input, config, (uint)reader.BaseStream.Position);
-                        return Export(decompressed_data, config);
+                        byte[] decompressed_data = Decompress(input, (uint)reader.BaseStream.Position);
+                        return Export(decompressed_data);
                     default:
                         throw new Exception("Compression type is not supported.");
                 }
@@ -163,11 +163,12 @@ namespace D3_Sqex03DataMessage
             return result;
         }
 
-        public static void ReImport(List<DataMessage> input, string original_directory, string working_directory, ArchiveConfig config)
+        public static byte[] ReImport(List<DataMessage> input, string file)
         {
             Dictionary<UInt32, List<string>> strings = new Dictionary<uint, List<string>>();
-            foreach (DataMessage data in input)
+            /*foreach (DataMessage data in input)
             {
+                
                 strings.Add((UInt32)data.Index, data.Strings);
             }
             List<string> archive_paths = Directory.GetFiles(original_directory, "*.XXX", SearchOption.AllDirectories)
@@ -182,30 +183,33 @@ namespace D3_Sqex03DataMessage
                 byte[] bytes = File.ReadAllBytes(file);
                 byte[] result = Reimport(bytes, strings, config);
                 File.WriteAllBytes(out_path, result);
-            }
+            }*/
+            byte[] original_file = File.ReadAllBytes(file);
+            byte[] result = Reimport(original_file, strings);
+            return result;
 
         }
 
-        /*public static void ReImport (byte[] input, string original_directory, string working_directory, ArchiveConfig config)
+        /*public static void ReImport (byte[] input, string file, ArchiveConfig config)
         {
-
+            
         }*/
 
-        private static byte[] Reimport (byte[] input, Dictionary<UInt32, List<string>> data, ArchiveConfig config)
+        private static byte[] Reimport (byte[] input, Dictionary<UInt32, List<string>> data)
         {
             MemoryStream result = new MemoryStream();
             MemoryStream input_stream = new MemoryStream(input);
             BinaryReaderBE reader = new BinaryReaderBE(input_stream);
             BeBinaryWriter writer = new BeBinaryWriter(result);
 
-            if (reader.ReadUInt32() == config.Signature)
+            if (reader.ReadUInt32() == ArchiveConfig.Signature)
             {
-                reader.BaseStream.Position = config.CompressionTypeOffset;
+                reader.BaseStream.Position = ArchiveConfig.CompressionTypeOffset;
                 UInt32 compress_type = reader.ReadUInt32();
                 switch (compress_type)
                 {
                     case 0:
-                        reader.BaseStream.Position = config.TableOffset;
+                        reader.BaseStream.Position = ArchiveConfig.TableOffset;
 
                         UInt32 name_count = reader.ReadUInt32();
                         UInt32 name_offset = reader.ReadUInt32();
@@ -243,7 +247,7 @@ namespace D3_Sqex03DataMessage
                             List<string> strings;
                             long string_bytes_changed = 0;
                             
-                            if (index_type == 2 && !config.Skip.Contains(order) && data.TryGetValue(order, out strings))
+                            if (index_type == 2 && !ArchiveConfig.Skip.Contains(order) && data.TryGetValue(order, out strings))
                             {
                                 writer_data.Write(reader.ReadBytes(72));
                                 UInt64 unknow_data_length = reader.ReadUInt64();
@@ -257,7 +261,7 @@ namespace D3_Sqex03DataMessage
                                 foreach (string line in strings) 
                                 {
                                     string line_str = line;
-                                    foreach (KeyValuePair<string, string> entry in config.Replace)
+                                    foreach (KeyValuePair<string, string> entry in ArchiveConfig.Replace)
                                     {
                                         line_str = line_str.Replace(entry.Value, entry.Key);
                                     }
@@ -300,7 +304,7 @@ namespace D3_Sqex03DataMessage
                             reader.BaseStream.Position += 4;
                             writer.Write(reader.ReadBytes((int)header_length - 40));
                         }
-                        writer.Write(new byte[config.TableToData]);
+                        writer.Write(new byte[ArchiveConfig.TableToData]);
                         foreach (byte[] data_message in new_data)
                         {
                             writer.Write(data_message);
@@ -308,8 +312,8 @@ namespace D3_Sqex03DataMessage
                         writer.Write(new byte[4]);
                         break;
                     case 1:
-                        byte[] decompressed_data = Decompress(input, config, (uint)reader.BaseStream.Position);
-                        return Reimport(decompressed_data, data, config);
+                        byte[] decompressed_data = Decompress(input, (uint)reader.BaseStream.Position);
+                        return Reimport(decompressed_data, data);
                     default:
                         throw new Exception("Compression type is not supported.");
                 }

@@ -15,11 +15,12 @@ namespace D3_Sqex03DataMessage
 {
     public partial class MainUI : Form
     {
-        ArchiveConfig _Config = new ArchiveConfig();
         string _AppDirectory = AppDomain.CurrentDomain.BaseDirectory;
         string _ConfigFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config", "config.json");
         string _MessageBoxTitle = "D3 Sqex03DataMessage";
-        Dictionary<string, string> _JsonConfig;
+        bool _IsBusy = false;
+        Dictionary<string, string> _JsonConfig = new Dictionary<string, string>();
+        List<ViewUI> _ViewUI = new List<ViewUI>();
         public MainUI()
         {
             InitializeComponent();
@@ -27,6 +28,7 @@ namespace D3_Sqex03DataMessage
 
         private void MainUI_Load(object sender, EventArgs e)
         {
+            ArchiveConfig.Initialization();
             if (!Directory.Exists(Path.GetDirectoryName(_ConfigFile)))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(_ConfigFile));
@@ -45,7 +47,9 @@ namespace D3_Sqex03DataMessage
 
         private void btnOpen_Click(object sender, EventArgs e)
         {
-            
+            string bakPath = Path.Combine(_AppDirectory, "Backup");
+            if (!Directory.Exists(bakPath)) Directory.CreateDirectory(bakPath);
+
         }
 
         private void btnReimport_Click(object sender, EventArgs e)
@@ -74,9 +78,14 @@ namespace D3_Sqex03DataMessage
                 }
                 catch (Exception err)
                 {
-                    MessageBox.Show($"An error occurred:\n\n{err.Message}");
+                    MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
                 }
             }
+        }
+
+        private void btnPreview_Click(object sender, EventArgs e)
+        {
+            
         }
     }
 }

@@ -34,14 +34,14 @@
             this.btnOpen = new System.Windows.Forms.Button();
             this.btnPreview = new System.Windows.Forms.Button();
             this.btnReimport = new System.Windows.Forms.Button();
-            this.progressBarOpen = new System.Windows.Forms.ProgressBar();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.listFiles = new System.Windows.Forms.ListBox();
+            this.btnExport = new System.Windows.Forms.Button();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // btnSelectOriginalFiles
             // 
-            this.btnSelectOriginalFiles.Location = new System.Drawing.Point(12, 41);
+            this.btnSelectOriginalFiles.Location = new System.Drawing.Point(12, 38);
             this.btnSelectOriginalFiles.Name = "btnSelectOriginalFiles";
             this.btnSelectOriginalFiles.Size = new System.Drawing.Size(75, 23);
             this.btnSelectOriginalFiles.TabIndex = 0;
@@ -52,7 +52,7 @@
             // labelGameLocation
             // 
             this.labelGameLocation.AutoSize = true;
-            this.labelGameLocation.Location = new System.Drawing.Point(12, 22);
+            this.labelGameLocation.Location = new System.Drawing.Point(12, 17);
             this.labelGameLocation.Name = "labelGameLocation";
             this.labelGameLocation.Size = new System.Drawing.Size(79, 13);
             this.labelGameLocation.TabIndex = 1;
@@ -60,7 +60,9 @@
             // 
             // txtBoxGameLocation
             // 
-            this.txtBoxGameLocation.Location = new System.Drawing.Point(93, 43);
+            this.txtBoxGameLocation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtBoxGameLocation.Location = new System.Drawing.Point(93, 40);
             this.txtBoxGameLocation.Name = "txtBoxGameLocation";
             this.txtBoxGameLocation.ReadOnly = true;
             this.txtBoxGameLocation.Size = new System.Drawing.Size(379, 20);
@@ -68,69 +70,77 @@
             // 
             // btnOpen
             // 
-            this.btnOpen.Location = new System.Drawing.Point(12, 137);
+            this.btnOpen.Location = new System.Drawing.Point(12, 79);
             this.btnOpen.Name = "btnOpen";
-            this.btnOpen.Size = new System.Drawing.Size(460, 23);
+            this.btnOpen.Size = new System.Drawing.Size(228, 23);
             this.btnOpen.TabIndex = 6;
-            this.btnOpen.Text = "Open";
+            this.btnOpen.Text = "Open / Decrypt";
             this.btnOpen.UseVisualStyleBackColor = true;
             this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
             // 
             // btnPreview
             // 
-            this.btnPreview.Location = new System.Drawing.Point(12, 218);
+            this.btnPreview.Location = new System.Drawing.Point(244, 79);
             this.btnPreview.Name = "btnPreview";
-            this.btnPreview.Size = new System.Drawing.Size(460, 23);
+            this.btnPreview.Size = new System.Drawing.Size(228, 23);
             this.btnPreview.TabIndex = 7;
             this.btnPreview.Text = "Preview / Edit";
             this.btnPreview.UseVisualStyleBackColor = true;
+            this.btnPreview.Click += new System.EventHandler(this.btnPreview_Click);
             // 
             // btnReimport
             // 
-            this.btnReimport.Location = new System.Drawing.Point(11, 175);
+            this.btnReimport.Location = new System.Drawing.Point(244, 106);
             this.btnReimport.Name = "btnReimport";
-            this.btnReimport.Size = new System.Drawing.Size(460, 23);
+            this.btnReimport.Size = new System.Drawing.Size(228, 23);
             this.btnReimport.TabIndex = 8;
             this.btnReimport.Text = "Re-Import";
             this.btnReimport.UseVisualStyleBackColor = true;
             this.btnReimport.Click += new System.EventHandler(this.btnReimport_Click);
             // 
-            // progressBarOpen
+            // listFiles
             // 
-            this.progressBarOpen.Location = new System.Drawing.Point(13, 161);
-            this.progressBarOpen.Name = "progressBarOpen";
-            this.progressBarOpen.Size = new System.Drawing.Size(458, 5);
-            this.progressBarOpen.TabIndex = 10;
+            this.listFiles.FormattingEnabled = true;
+            this.listFiles.Location = new System.Drawing.Point(12, 183);
+            this.listFiles.Name = "listFiles";
+            this.listFiles.Size = new System.Drawing.Size(456, 290);
+            this.listFiles.TabIndex = 9;
             // 
-            // progressBar1
+            // btnExport
             // 
-            this.progressBar1.Location = new System.Drawing.Point(12, 200);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(458, 5);
-            this.progressBar1.TabIndex = 11;
+            this.btnExport.Location = new System.Drawing.Point(12, 106);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(228, 23);
+            this.btnExport.TabIndex = 10;
+            this.btnExport.Text = "Export";
+            this.btnExport.UseVisualStyleBackColor = true;
             // 
-            // listBox1
+            // progressBar
             // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(12, 260);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(460, 212);
-            this.listBox1.TabIndex = 9;
+            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar.Location = new System.Drawing.Point(13, 144);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(458, 23);
+            this.progressBar.TabIndex = 11;
             // 
             // MainUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(484, 511);
-            this.Controls.Add(this.progressBar1);
-            this.Controls.Add(this.progressBarOpen);
-            this.Controls.Add(this.listBox1);
+            this.Controls.Add(this.progressBar);
+            this.Controls.Add(this.btnExport);
+            this.Controls.Add(this.listFiles);
             this.Controls.Add(this.btnReimport);
             this.Controls.Add(this.btnPreview);
             this.Controls.Add(this.btnOpen);
             this.Controls.Add(this.txtBoxGameLocation);
             this.Controls.Add(this.labelGameLocation);
             this.Controls.Add(this.btnSelectOriginalFiles);
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(500, 550);
+            this.MinimumSize = new System.Drawing.Size(500, 550);
             this.Name = "MainUI";
             this.Text = "Drakengard 3 - Sqex03DataMessage";
             this.Load += new System.EventHandler(this.MainUI_Load);
@@ -147,9 +157,9 @@
         private System.Windows.Forms.Button btnOpen;
         private System.Windows.Forms.Button btnPreview;
         private System.Windows.Forms.Button btnReimport;
-        private System.Windows.Forms.ProgressBar progressBarOpen;
-        private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.ListBox listFiles;
+        private System.Windows.Forms.Button btnExport;
+        private System.Windows.Forms.ProgressBar progressBar;
     }
 }
 
