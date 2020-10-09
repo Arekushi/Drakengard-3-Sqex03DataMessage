@@ -29,9 +29,8 @@
         private void InitializeComponent()
         {
             this.listView = new System.Windows.Forms.ListView();
-            this.columnLine = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnEnglish = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnTranslation = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnText = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.labelFileNameTitle = new System.Windows.Forms.Label();
             this.labelFileName = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -42,9 +41,8 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnLine,
-            this.columnEnglish,
-            this.columnTranslation});
+            this.columnId,
+            this.columnText});
             this.listView.HideSelection = false;
             this.listView.Location = new System.Drawing.Point(12, 34);
             this.listView.Name = "listView";
@@ -53,20 +51,15 @@
             this.listView.UseCompatibleStateImageBehavior = false;
             this.listView.View = System.Windows.Forms.View.Details;
             // 
-            // columnLine
+            // columnId
             // 
-            this.columnLine.Text = "Line";
-            this.columnLine.Width = 55;
+            this.columnId.Text = "ID";
+            this.columnId.Width = 40;
             // 
-            // columnEnglish
+            // columnText
             // 
-            this.columnEnglish.Text = "English / Japanese";
-            this.columnEnglish.Width = 250;
-            // 
-            // columnTranslation
-            // 
-            this.columnTranslation.Text = "Translation";
-            this.columnTranslation.Width = 250;
+            this.columnText.Text = "Text";
+            this.columnText.Width = 495;
             // 
             // labelFileNameTitle
             // 
@@ -105,11 +98,10 @@
         }
 
         #endregion
-        private System.Windows.Forms.ColumnHeader columnLine;
-        private System.Windows.Forms.ColumnHeader columnEnglish;
-        private System.Windows.Forms.ColumnHeader columnTranslation;
         private System.Windows.Forms.Label labelFileNameTitle;
         public System.Windows.Forms.ListView listView;
         public System.Windows.Forms.Label labelFileName;
+        public System.Windows.Forms.ColumnHeader columnId;
+        public System.Windows.Forms.ColumnHeader columnText;
     }
 }

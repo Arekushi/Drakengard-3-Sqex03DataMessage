@@ -78,14 +78,12 @@ namespace D3_Sqex03DataMessage
                     Backup(bakPath);
                 }
 
-                string archive = Directory.GetFiles(bakPath, "*.XXX", SearchOption.AllDirectories)
+                string archive = Directory.GetFiles(_JsonConfig["GameLocation"], "*.XXX", SearchOption.AllDirectories)
                     .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).FirstOrDefault();
                 if (!string.IsNullOrEmpty(archive))
                 {
-                    Directory.Delete(bakPath, true);
-                    Backup(bakPath);
+                    result = Sqex03DataMessage.Export(File.ReadAllBytes(archive));
                 }
-                result = Sqex03DataMessage.Export(File.ReadAllBytes(archive));
             }
             catch (Exception err)
             {
@@ -103,8 +101,15 @@ namespace D3_Sqex03DataMessage
                 foreach (DataMessage data in _DataMessage)
                 {
                     listFiles.Items.Add($"[{data.Index}] - {data.Name}");
-                    //ViewUI view = new ViewUI();
-                    
+                    ViewUI view = new ViewUI();
+                    view.labelFileName.Text = data.Name;
+                    for (int i = 0; i < data.Strings.Count; i++)
+                    {
+                        ListViewItem item = new ListViewItem($"{i}");
+                        item.SubItems.Add(data.Strings[i]);
+                        view.listView.Items.Add(item);
+                    }
+                    _ViewUI.Add(view);
                 }
             });
         }
@@ -159,7 +164,9 @@ namespace D3_Sqex03DataMessage
 
         private void btnPreview_Click(object sender, EventArgs e)
         {
-            
+            if (listFiles.SelectedIndex < 0) return;
+            int index = listFiles.SelectedIndex;
+            _ViewUI[index].Show();
         }
     }
 }

@@ -27,9 +27,7 @@ namespace D3_Sqex03DataMessage
         {
             int width = listView.Width;
             if (width < 560 && width > 0) return;
-            listView.Columns[0].Width = (width / 10) - 4;
-            listView.Columns[1].Width = (width - (width / 10)) / 2;
-            listView.Columns[2].Width = (width - (width / 10)) / 2;
+            listView.Columns[1].Width = (width - 65);
         }
     }
 }
