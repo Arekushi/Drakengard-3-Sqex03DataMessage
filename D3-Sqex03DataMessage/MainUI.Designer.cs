@@ -36,7 +36,6 @@
             this.btnReimport = new System.Windows.Forms.Button();
             this.listFiles = new System.Windows.Forms.ListBox();
             this.btnExport = new System.Windows.Forms.Button();
-            this.progressBar = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // btnSelectOriginalFiles
@@ -101,9 +100,9 @@
             // listFiles
             // 
             this.listFiles.FormattingEnabled = true;
-            this.listFiles.Location = new System.Drawing.Point(12, 183);
+            this.listFiles.Location = new System.Drawing.Point(12, 144);
             this.listFiles.Name = "listFiles";
-            this.listFiles.Size = new System.Drawing.Size(456, 290);
+            this.listFiles.Size = new System.Drawing.Size(456, 329);
             this.listFiles.TabIndex = 9;
             this.listFiles.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listFiles_MouseDoubleClick);
             // 
@@ -116,21 +115,11 @@
             this.btnExport.Text = "Export";
             this.btnExport.UseVisualStyleBackColor = true;
             // 
-            // progressBar
-            // 
-            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar.Location = new System.Drawing.Point(13, 144);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(458, 23);
-            this.progressBar.TabIndex = 11;
-            // 
             // MainUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(484, 511);
-            this.Controls.Add(this.progressBar);
             this.Controls.Add(this.btnExport);
             this.Controls.Add(this.listFiles);
             this.Controls.Add(this.btnReimport);
@@ -160,7 +149,6 @@
         private System.Windows.Forms.Button btnReimport;
         private System.Windows.Forms.ListBox listFiles;
         private System.Windows.Forms.Button btnExport;
-        private System.Windows.Forms.ProgressBar progressBar;
     }
 }
 
