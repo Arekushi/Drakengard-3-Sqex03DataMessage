@@ -136,9 +136,9 @@ namespace D3_Sqex03DataMessage
                                     }
                                     
                                     string str = zero_bytes < 2 ? Encoding.UTF8.GetString(reader.ReadBytes((int)str_length - zero_bytes)) : Encoding.Unicode.GetString(reader.ReadBytes((int)str_length));
-                                    foreach (KeyValuePair<string, string> entry in ArchiveConfig.Replace)
+                                    for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
                                     {
-                                        str = str.Replace(entry.Key, entry.Value);
+                                        str = str.Replace(ArchiveConfig.OriginalChars[k], ArchiveConfig.ReplaceChars[k]);
                                     }
                                     strings.Add(str);
                                     reader.BaseStream.Position += zero_bytes;
@@ -261,9 +261,9 @@ namespace D3_Sqex03DataMessage
                                 foreach (string line in strings) 
                                 {
                                     string line_str = line;
-                                    foreach (KeyValuePair<string, string> entry in ArchiveConfig.Replace)
+                                    for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
                                     {
-                                        line_str = line_str.Replace(entry.Value, entry.Key);
+                                        line_str = line_str.Replace(ArchiveConfig.ReplaceChars[k], ArchiveConfig.OriginalChars[k]);
                                     }
                                     long str_length = line_str.Length ^ 0xFFFFFFFF;
                                     writer_temp.Write((Int32)str_length);
