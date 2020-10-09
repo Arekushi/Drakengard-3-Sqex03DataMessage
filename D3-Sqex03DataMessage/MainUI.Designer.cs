@@ -105,6 +105,7 @@
             this.listFiles.Name = "listFiles";
             this.listFiles.Size = new System.Drawing.Size(456, 290);
             this.listFiles.TabIndex = 9;
+            this.listFiles.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listFiles_MouseDoubleClick);
             // 
             // btnExport
             // 

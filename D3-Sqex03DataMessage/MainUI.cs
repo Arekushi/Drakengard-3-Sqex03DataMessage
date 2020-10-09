@@ -21,7 +21,6 @@ namespace D3_Sqex03DataMessage
         bool _IsBusy = false;
         List<DataMessage> _DataMessage = new List<DataMessage>();
         Dictionary<string, string> _JsonConfig = new Dictionary<string, string>();
-        List<ViewUI> _ViewUI = new List<ViewUI>();
         public MainUI()
         {
             InitializeComponent();
@@ -49,7 +48,7 @@ namespace D3_Sqex03DataMessage
         {
             if (!_JsonConfig.ContainsKey("GameLocation")||_IsBusy)
             {
-                string msg = _IsBusy ? "" : "Please select the game location.";
+                string msg = _IsBusy ? "" : "Please select game directory.";
                 MessageBox.Show(msg, _MessageBoxTitle);
                 return;
             }
@@ -101,15 +100,6 @@ namespace D3_Sqex03DataMessage
                 foreach (DataMessage data in _DataMessage)
                 {
                     listFiles.Items.Add($"[{data.Index}] - {data.Name}");
-                    ViewUI view = new ViewUI();
-                    view.labelFileName.Text = data.Name;
-                    for (int i = 0; i < data.Strings.Count; i++)
-                    {
-                        ListViewItem item = new ListViewItem($"{i}");
-                        item.SubItems.Add(data.Strings[i]);
-                        view.listView.Items.Add(item);
-                    }
-                    _ViewUI.Add(view);
                 }
             });
         }
@@ -164,9 +154,34 @@ namespace D3_Sqex03DataMessage
 
         private void btnPreview_Click(object sender, EventArgs e)
         {
+            Open_Preview();
+        }
+
+        private void listFiles_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            Open_Preview();
+        }
+
+        private void Open_Preview()
+        {
             if (listFiles.SelectedIndex < 0) return;
             int index = listFiles.SelectedIndex;
-            _ViewUI[index].Show();
+            try
+            {
+                ViewUI view = new ViewUI();           
+                DataMessage data = _DataMessage[index];
+                view.labelFileName.Text = data.Name;
+                view.labelIndex.Text = $"{data.Index}";
+                for (int i = 0; i < data.Strings.Count; i++)
+                {
+                    view.dataGridView.Rows.Add($"{i}", data.Strings[i]);
+                }
+                view.Show();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
+            }
         }
     }
 }

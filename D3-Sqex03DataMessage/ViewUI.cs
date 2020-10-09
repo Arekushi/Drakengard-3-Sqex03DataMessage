@@ -20,14 +20,13 @@ namespace D3_Sqex03DataMessage
 
         private void ViewUI_Load(object sender, EventArgs e)
         {
-
+            
         }
 
         private void View_Resize(object sender, EventArgs e)
         {
-            int width = listView.Width;
-            if (width < 560 && width > 0) return;
-            listView.Columns[1].Width = (width - 65);
+            int width = dataGridView.Width;
+            dataGridView.Columns[1].Width = width - 50;
         }
     }
 }
