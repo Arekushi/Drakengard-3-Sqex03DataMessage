@@ -19,7 +19,7 @@ namespace D3_Sqex03DataMessage
         string _ConfigFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config", "config.json");
         string _MessageBoxTitle = "D3 Sqex03DataMessage";
         bool _IsBusy = false;
-        List<DataMessage> _DataMessage = new List<DataMessage>();
+        //List<DataMessage> _DataMessage = new List<DataMessage>();
         Dictionary<string, string> _JsonConfig = new Dictionary<string, string>();
         public MainUI()
         {
@@ -48,7 +48,7 @@ namespace D3_Sqex03DataMessage
         {
             if (!_JsonConfig.ContainsKey("GameLocation")||_IsBusy)
             {
-                string msg = _IsBusy ? "" : "Please select game directory.";
+                string msg = _IsBusy ? "Another task is already in progress." : "Please select your game directory.";
                 MessageBox.Show(msg, _MessageBoxTitle);
                 return;
             }
@@ -58,8 +58,7 @@ namespace D3_Sqex03DataMessage
                 List<DataMessage> data = Open_Archive();
                 if (data.Count > 0)
                 {
-                    _DataMessage = data;
-                    
+                    AllMessage.AllDataMessage = data;
                     Get_Content();
                 }
             });
@@ -97,7 +96,7 @@ namespace D3_Sqex03DataMessage
             this.listFiles.BeginInvoke((MethodInvoker)delegate ()
             {
                 listFiles.Items.Clear();
-                foreach (DataMessage data in _DataMessage)
+                foreach (DataMessage data in AllMessage.AllDataMessage)
                 {
                     listFiles.Items.Add($"[{data.Index}] - {data.Name}");
                 }
@@ -169,7 +168,7 @@ namespace D3_Sqex03DataMessage
             try
             {
                 ViewUI view = new ViewUI();           
-                DataMessage data = _DataMessage[index];
+                DataMessage data = AllMessage.AllDataMessage[index];
                 view.labelFileName.Text = data.Name;
                 view.labelIndex.Text = $"{data.Index}";
                 for (int i = 0; i < data.Strings.Count; i++)

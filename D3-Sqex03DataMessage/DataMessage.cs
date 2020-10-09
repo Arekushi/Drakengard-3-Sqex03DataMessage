@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace D3_Sqex03DataMessage
 {
-    class DataMessage
+    public class DataMessage
     {
         public string Name { get; set; }
         public int Index { get; set; }
