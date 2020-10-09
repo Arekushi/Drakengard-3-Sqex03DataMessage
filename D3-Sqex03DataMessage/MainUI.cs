@@ -60,6 +60,7 @@ namespace D3_Sqex03DataMessage
                 if (data.Count > 0)
                 {
                     _DataMessage = data;
+                    
                     Get_Content();
                 }
             });
@@ -79,6 +80,11 @@ namespace D3_Sqex03DataMessage
 
                 string archive = Directory.GetFiles(bakPath, "*.XXX", SearchOption.AllDirectories)
                     .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).FirstOrDefault();
+                if (!string.IsNullOrEmpty(archive))
+                {
+                    Directory.Delete(bakPath, true);
+                    Backup(bakPath);
+                }
                 result = Sqex03DataMessage.Export(File.ReadAllBytes(archive));
             }
             catch (Exception err)
@@ -96,7 +102,7 @@ namespace D3_Sqex03DataMessage
                 listFiles.Items.Clear();
                 foreach (DataMessage data in _DataMessage)
                 {
-                    listFiles.Items.Add($"{data.Index} - {data.Name}");
+                    listFiles.Items.Add($"[{data.Index}] - {data.Name}");
                     //ViewUI view = new ViewUI();
                     
                 }
@@ -110,11 +116,14 @@ namespace D3_Sqex03DataMessage
                 .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).ToList();
             string toc = Directory.GetFiles(_JsonConfig["GameLocation"], "*.txt", SearchOption.AllDirectories)
                 .Where(file => ArchiveConfig.TOCName == Path.GetFileName(file)).FirstOrDefault();
-            foreach (string file in archives)
+            if (archives.Count > 0)
             {
-                File.Copy(file, Path.Combine(bakPath, Path.GetFileName(file)));
+                foreach (string file in archives)
+                {
+                    File.Copy(file, Path.Combine(bakPath, Path.GetFileName(file)));
+                }
             }
-            File.Copy(toc, Path.Combine(bakPath, Path.GetFileName(toc)));
+            if (!string.IsNullOrEmpty(toc)) File.Copy(toc, Path.Combine(bakPath, Path.GetFileName(toc)));
         }
 
         private void btnReimport_Click(object sender, EventArgs e)

@@ -166,24 +166,6 @@ namespace D3_Sqex03DataMessage
         public static byte[] ReImport(List<DataMessage> input, string file)
         {
             Dictionary<UInt32, List<string>> strings = new Dictionary<uint, List<string>>();
-            /*foreach (DataMessage data in input)
-            {
-                
-                strings.Add((UInt32)data.Index, data.Strings);
-            }
-            List<string> archive_paths = Directory.GetFiles(original_directory, "*.XXX", SearchOption.AllDirectories)
-                .Where(file => config.ArchiveName.Contains(Path.GetFileName(file))).ToList();
-            string toc_path = Directory.GetFiles(original_directory, "*.txt", SearchOption.AllDirectories)
-                .Where(file => Path.GetFileName(file) == config.TOCName).FirstOrDefault();
-            string import_path = Path.Combine(working_directory, "ReImport");
-            if (!Directory.Exists(import_path)) Directory.CreateDirectory(import_path);
-            foreach (string file in archive_paths)
-            {
-                string out_path = Path.Combine(import_path, Path.GetFileName(file));
-                byte[] bytes = File.ReadAllBytes(file);
-                byte[] result = Reimport(bytes, strings, config);
-                File.WriteAllBytes(out_path, result);
-            }*/
             byte[] original_file = File.ReadAllBytes(file);
             byte[] result = Reimport(original_file, strings);
             return result;
