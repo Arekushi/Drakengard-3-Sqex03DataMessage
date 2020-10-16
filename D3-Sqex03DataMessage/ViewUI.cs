@@ -26,7 +26,13 @@ namespace D3_Sqex03DataMessage
         private void View_Resize(object sender, EventArgs e)
         {
             int width = dataGridView.Width;
-            dataGridView.Columns[1].Width = width - 50;
+            dataGridView.Columns[1].Width = width - 60;
+        }
+
+        private void dataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            int index = int.Parse(labelIndex.Text);
+            MainUI._DataMessage[index].Strings[e.RowIndex] = $"{dataGridView.Rows[e.RowIndex].Cells[1].Value}";
         }
     }
 }

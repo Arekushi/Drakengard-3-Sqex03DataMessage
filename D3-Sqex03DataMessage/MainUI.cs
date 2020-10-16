@@ -19,7 +19,7 @@ namespace D3_Sqex03DataMessage
         string _ConfigFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config", "config.json");
         string _MessageBoxTitle = "D3 Sqex03DataMessage";
         bool _IsBusy = false;
-        //List<DataMessage> _DataMessage = new List<DataMessage>();
+        public static List<DataMessage> _DataMessage = new List<DataMessage>();
         Dictionary<string, string> _JsonConfig = new Dictionary<string, string>();
         public MainUI()
         {
@@ -58,7 +58,7 @@ namespace D3_Sqex03DataMessage
                 List<DataMessage> data = Open_Archive();
                 if (data.Count > 0)
                 {
-                    AllMessage.AllDataMessage = data;
+                    _DataMessage = data;
                     Get_Content();
                 }
             });
@@ -96,7 +96,7 @@ namespace D3_Sqex03DataMessage
             this.listFiles.BeginInvoke((MethodInvoker)delegate ()
             {
                 listFiles.Items.Clear();
-                foreach (DataMessage data in AllMessage.AllDataMessage)
+                foreach (DataMessage data in _DataMessage)
                 {
                     listFiles.Items.Add($"[{data.Index}] - {data.Name}");
                 }
@@ -168,9 +168,9 @@ namespace D3_Sqex03DataMessage
             try
             {
                 ViewUI view = new ViewUI();           
-                DataMessage data = AllMessage.AllDataMessage[index];
+                DataMessage data = _DataMessage[index];
                 view.labelFileName.Text = data.Name;
-                view.labelIndex.Text = $"{data.Index}";
+                view.labelIndex.Text = $"{index}";
                 for (int i = 0; i < data.Strings.Count; i++)
                 {
                     view.dataGridView.Rows.Add($"{i}", data.Strings[i]);

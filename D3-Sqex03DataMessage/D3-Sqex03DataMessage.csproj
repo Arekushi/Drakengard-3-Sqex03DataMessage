@@ -49,7 +49,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AllMessage.cs" />
     <Compile Include="ArchiveConfig.cs" />
     <Compile Include="BinaryReaderBE.cs" />
     <Compile Include="CompressedChunk.cs" />
