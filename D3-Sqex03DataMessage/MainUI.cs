@@ -44,34 +44,44 @@ namespace D3_Sqex03DataMessage
             }
         }
 
+        public void ProgressBar(int percent)
+        {
+            this.progressBar.BeginInvoke((MethodInvoker)delegate
+            {
+                progressBar.Value = percent > 100 ? 100 : percent;
+            });
+        }
+
         private void btnOpen_Click(object sender, EventArgs e)
         {
             if (!_JsonConfig.ContainsKey("GameLocation")||_IsBusy)
             {
                 string msg = _IsBusy ? "Another task is already in progress." : "Please select your game directory.";
                 MessageBox.Show(msg, _MessageBoxTitle);
-                return;
             }
-            _IsBusy = true;
-            Task.Run(() =>
+            else
             {
-                try
+                _IsBusy = true;
+                Task.Run(() =>
                 {
-                    List<DataMessage> data = Operation.Decrypt(_AppDirectory, _JsonConfig["GameLocation"]);
-                    if (data.Count > 0)
+                    try
                     {
-                        _DataMessage = data;
-                        Show_Archives();
+                        List<DataMessage> data = Operation.Decrypt(_AppDirectory, _JsonConfig["GameLocation"]);
+                        if (data.Count > 0)
+                        {
+                            _DataMessage = data;
+                            Show_Archives();
+                        }
+                        _IsBusy = false;
                     }
-                    _IsBusy = false;
-                }
-                catch (Exception err)
-                {
-                    _IsBusy = false;
-                    _DataMessage.Clear();
-                    MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
-                }
-            });
+                    catch (Exception err)
+                    {
+                        _IsBusy = false;
+                        _DataMessage.Clear();
+                        MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
+                    }
+                });
+            } 
         }
 
         private void Show_Archives()
@@ -117,11 +127,6 @@ namespace D3_Sqex03DataMessage
             }
         }
 
-        private void btnPreview_Click(object sender, EventArgs e)
-        {
-            Open_Preview();
-        }
-
         private void listFiles_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             Open_Preview();
@@ -147,6 +152,37 @@ namespace D3_Sqex03DataMessage
             {
                 MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
             }
+        }
+
+        private void btnExport_Click(object sender, EventArgs e)
+        {
+            if (_DataMessage.Count() < 1 || _IsBusy)
+            {
+                string msg = _IsBusy ? "Another task is already in progress." : "There's no data to export.";
+                MessageBox.Show(msg, _MessageBoxTitle);
+            }
+            else
+            {
+                _IsBusy = true;
+                string export_dir = FolderBrowser.FolderBrowserDialog("Export (Directory)");
+                if (!string.IsNullOrEmpty(export_dir))
+                {
+                    Task.Run(() =>
+                    {
+                        try
+                        {
+                            Operation.Export(export_dir, _DataMessage);
+                            _IsBusy = false;
+                        }
+                        catch (Exception err)
+                        {
+                            _IsBusy = false;
+                            MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
+                        }
+                    });
+                }
+            }
+            
         }
     }
 }

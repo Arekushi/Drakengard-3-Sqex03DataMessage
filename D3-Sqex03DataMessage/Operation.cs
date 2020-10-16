@@ -37,7 +37,16 @@ namespace D3_Sqex03DataMessage
             }
             return result;
         }
-
+        public static void Export(string export_dir, List<DataMessage> data_message)
+        {
+            
+            foreach (DataMessage data in data_message)
+            {
+                string file = Path.Combine(export_dir, $"[{data.Index}] {data.Name}.txt");
+                string content = String.Join("\r\n", data.Strings.ToArray());
+                File.WriteAllText(file, content);
+            }
+        }
         public static void Repack()
         {
 

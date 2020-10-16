@@ -166,10 +166,13 @@ namespace D3_Sqex03DataMessage
         public static byte[] ReImport(List<DataMessage> input, string file)
         {
             Dictionary<UInt32, List<string>> strings = new Dictionary<uint, List<string>>();
+            foreach (DataMessage data in input)
+            {
+                strings.Add((uint)data.Index, data.Strings);
+            }
             byte[] original_file = File.ReadAllBytes(file);
             byte[] result = Reimport(original_file, strings);
             return result;
-
         }
 
         /*public static void ReImport (byte[] input, string file, ArchiveConfig config)
