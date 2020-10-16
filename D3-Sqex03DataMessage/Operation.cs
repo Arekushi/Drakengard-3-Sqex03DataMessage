@@ -18,7 +18,7 @@ namespace D3_Sqex03DataMessage
                 {
                     foreach (string file in files)
                     {
-                        File.Copy(file, Path.Combine(dest, Path.GetFileName(file)));
+                        File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), true);
                     }
                 }
             }
@@ -33,18 +33,21 @@ namespace D3_Sqex03DataMessage
                     .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).FirstOrDefault();
             if (!string.IsNullOrEmpty(archive))
             {
-                result = Sqex03DataMessage.Export(File.ReadAllBytes(archive));
+                result = Sqex03DataMessage.Decrypt(File.ReadAllBytes(archive));
             }
             return result;
         }
-        public static void Export(string export_dir, List<DataMessage> data_message)
+        public static void Export(string export_dir, List<DataMessage> data_message, MainUI form)
         {
-            
+            double percent = 100.0 / data_message.Count();
+            form.ProgressBar((int)percent);
             foreach (DataMessage data in data_message)
             {
                 string file = Path.Combine(export_dir, $"[{data.Index}] {data.Name}.txt");
                 string content = String.Join("\r\n", data.Strings.ToArray());
                 File.WriteAllText(file, content);
+                percent += 100.0 / data_message.Count();
+                form.ProgressBar((int)percent);
             }
         }
         public static void Repack()

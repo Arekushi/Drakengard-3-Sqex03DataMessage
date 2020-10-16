@@ -59,7 +59,7 @@ namespace D3_Sqex03DataMessage
             return result.ToArray();
         }
 
-        public static List<DataMessage> Export(byte[] input)
+        public static List<DataMessage> Decrypt(byte[] input)
         {
             List<DataMessage> result = new List<DataMessage>();
             MemoryStream stream = new MemoryStream(input);
@@ -150,7 +150,7 @@ namespace D3_Sqex03DataMessage
                         break;
                     case 1:
                         byte[] decompressed_data = Decompress(input, (uint)reader.BaseStream.Position);
-                        return Export(decompressed_data);
+                        return Decrypt(decompressed_data);
                     default:
                         throw new Exception("Compression type is not supported.");
                 }

@@ -171,7 +171,7 @@ namespace D3_Sqex03DataMessage
                     {
                         try
                         {
-                            Operation.Export(export_dir, _DataMessage);
+                            Operation.Export(export_dir, _DataMessage, this);
                             _IsBusy = false;
                         }
                         catch (Exception err)
