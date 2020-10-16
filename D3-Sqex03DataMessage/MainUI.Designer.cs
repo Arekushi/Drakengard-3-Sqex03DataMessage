@@ -147,8 +147,8 @@
         private System.Windows.Forms.Button btnOpen;
         private System.Windows.Forms.Button btnPreview;
         private System.Windows.Forms.Button btnReimport;
-        private System.Windows.Forms.ListBox listFiles;
         private System.Windows.Forms.Button btnExport;
+        private System.Windows.Forms.ListBox listFiles;
     }
 }
 

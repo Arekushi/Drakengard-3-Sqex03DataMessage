@@ -55,43 +55,26 @@ namespace D3_Sqex03DataMessage
             _IsBusy = true;
             Task.Run(() =>
             {
-                List<DataMessage> data = Open_Archive();
-                if (data.Count > 0)
+                try
                 {
-                    _DataMessage = data;
-                    Get_Content();
+                    List<DataMessage> data = Operation.Decrypt(_AppDirectory, _JsonConfig["GameLocation"]);
+                    if (data.Count > 0)
+                    {
+                        _DataMessage = data;
+                        Show_Archives();
+                    }
+                    _IsBusy = false;
+                }
+                catch (Exception err)
+                {
+                    _IsBusy = false;
+                    _DataMessage.Clear();
+                    MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
                 }
             });
-            _IsBusy = false;
         }
 
-        private List<DataMessage> Open_Archive()
-        {
-            string bakPath = Path.Combine(_AppDirectory, "Backup");
-            List<DataMessage> result = new List<DataMessage>();
-            try
-            {
-                if (!Directory.Exists(bakPath))
-                {
-                    Backup(bakPath);
-                }
-
-                string archive = Directory.GetFiles(_JsonConfig["GameLocation"], "*.XXX", SearchOption.AllDirectories)
-                    .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).FirstOrDefault();
-                if (!string.IsNullOrEmpty(archive))
-                {
-                    result = Sqex03DataMessage.Export(File.ReadAllBytes(archive));
-                }
-            }
-            catch (Exception err)
-            {
-                result.Clear();
-                MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
-            }
-            return result;
-        }
-
-        private void Get_Content()
+        private void Show_Archives()
         {
             this.listFiles.BeginInvoke((MethodInvoker)delegate ()
             {
@@ -101,23 +84,6 @@ namespace D3_Sqex03DataMessage
                     listFiles.Items.Add($"[{data.Index}] - {data.Name}");
                 }
             });
-        }
-
-        private void Backup(string bakPath)
-        {
-            Directory.CreateDirectory(bakPath);
-            List<string> archives = Directory.GetFiles(_JsonConfig["GameLocation"], "*.XXX", SearchOption.AllDirectories)
-                .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).ToList();
-            string toc = Directory.GetFiles(_JsonConfig["GameLocation"], "*.txt", SearchOption.AllDirectories)
-                .Where(file => ArchiveConfig.TOCName == Path.GetFileName(file)).FirstOrDefault();
-            if (archives.Count > 0)
-            {
-                foreach (string file in archives)
-                {
-                    File.Copy(file, Path.Combine(bakPath, Path.GetFileName(file)));
-                }
-            }
-            if (!string.IsNullOrEmpty(toc)) File.Copy(toc, Path.Combine(bakPath, Path.GetFileName(toc)));
         }
 
         private void btnReimport_Click(object sender, EventArgs e)
