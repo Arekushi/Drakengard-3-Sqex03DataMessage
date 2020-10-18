@@ -98,7 +98,28 @@ namespace D3_Sqex03DataMessage
 
         private void btnReimport_Click(object sender, EventArgs e)
         {
-            
+            if (!_JsonConfig.ContainsKey("GameLocation") || _IsBusy)
+            {
+                string msg = _IsBusy ? "Another task is already in progress." : "Please select your game directory.";
+                MessageBox.Show(msg, _MessageBoxTitle);
+            }
+            else
+            {
+                _IsBusy = true;
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        Operation.Repack(_AppDirectory, _JsonConfig["GameLocation"], _DataMessage);
+                        _IsBusy = false;
+                    }
+                    catch (Exception err)
+                    {
+                        _IsBusy = false;
+                        MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
+                    }
+                });
+            }
         }
 
         private void btnSelectGameLocation_Click(object sender, EventArgs e)

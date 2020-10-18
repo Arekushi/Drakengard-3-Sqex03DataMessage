@@ -50,9 +50,22 @@ namespace D3_Sqex03DataMessage
                 form.ProgressBar((int)percent);
             }
         }
-        public static void Repack()
+        public static void Repack(string app_dir, string game_dir, List<DataMessage> data)
         {
-
+            string bak_dir = Path.Combine(app_dir, "Backup");
+            Backup(game_dir, bak_dir);
+            List<string> archives = Directory.GetFiles(game_dir, "*.XXX", SearchOption.AllDirectories)
+                    .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).ToList();
+            string toc = Directory.GetFiles(game_dir, "*.txt", SearchOption.AllDirectories)
+                    .Where(file => ArchiveConfig.TOCName == Path.GetFileName(file)).FirstOrDefault();
+            if (archives.Count > 0)
+            {
+                foreach (string archive in archives)
+                {
+                    byte[] bytes = Sqex03DataMessage.ReImport(data, archive);
+                    File.WriteAllBytes(archive, bytes);
+                }
+            }
         }
     }
 }

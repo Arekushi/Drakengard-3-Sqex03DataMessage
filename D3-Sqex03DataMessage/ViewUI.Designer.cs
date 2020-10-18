@@ -36,10 +36,10 @@
             this.labelFileNameTitle = new System.Windows.Forms.Label();
             this.labelFileName = new System.Windows.Forms.Label();
             this.dataGridView = new System.Windows.Forms.DataGridView();
-            this.labelIndexTitle = new System.Windows.Forms.Label();
-            this.labelIndex = new System.Windows.Forms.Label();
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColText = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.labelIndexTitle = new System.Windows.Forms.Label();
+            this.labelIndex = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -63,6 +63,8 @@
             // 
             // dataGridView
             // 
+            this.dataGridView.AllowUserToAddRows = false;
+            this.dataGridView.AllowUserToDeleteRows = false;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dataGridView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -108,6 +110,19 @@
             this.dataGridView.TabIndex = 3;
             this.dataGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellEndEdit);
             // 
+            // ID
+            // 
+            this.ID.HeaderText = "ID";
+            this.ID.Name = "ID";
+            this.ID.ReadOnly = true;
+            this.ID.Width = 40;
+            // 
+            // ColText
+            // 
+            this.ColText.HeaderText = "Text";
+            this.ColText.Name = "ColText";
+            this.ColText.Width = 500;
+            // 
             // labelIndexTitle
             // 
             this.labelIndexTitle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -127,19 +142,6 @@
             this.labelIndex.Size = new System.Drawing.Size(22, 13);
             this.labelIndex.TabIndex = 5;
             this.labelIndex.Text = "NA";
-            // 
-            // ID
-            // 
-            this.ID.HeaderText = "ID";
-            this.ID.Name = "ID";
-            this.ID.ReadOnly = true;
-            this.ID.Width = 40;
-            // 
-            // ColText
-            // 
-            this.ColText.HeaderText = "Text";
-            this.ColText.Name = "ColText";
-            this.ColText.Width = 500;
             // 
             // ViewUI
             // 
