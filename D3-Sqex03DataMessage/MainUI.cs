@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Web.Script.Serialization;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace D3_Sqex03DataMessage
 {
@@ -44,14 +45,6 @@ namespace D3_Sqex03DataMessage
             }
         }
 
-        public void ProgressBar(int percent)
-        {
-            this.progressBar.BeginInvoke((MethodInvoker)delegate
-            {
-                progressBar.Value = percent > 100 ? 100 : percent;
-            });
-        }
-
         private void btnOpen_Click(object sender, EventArgs e)
         {
             if (!_JsonConfig.ContainsKey("GameLocation")||_IsBusy)
@@ -70,9 +63,15 @@ namespace D3_Sqex03DataMessage
                         if (data.Count > 0)
                         {
                             _DataMessage = data;
-                            Show_Archives();
+                            this.listFiles.BeginInvoke((MethodInvoker)delegate ()
+                            {
+                                listFiles.Items.Clear();
+                                foreach (DataMessage entry in _DataMessage)
+                                {
+                                    listFiles.Items.Add($"[{entry.Index}] - {entry.Name}");
+                                }
+                            });
                         }
-                        _IsBusy = false;
                     }
                     catch (Exception err)
                     {
@@ -80,21 +79,10 @@ namespace D3_Sqex03DataMessage
                         _DataMessage.Clear();
                         MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
                     }
-                });
+                }).GetAwaiter().OnCompleted(() => { _IsBusy = false; });
             } 
         }
 
-        private void Show_Archives()
-        {
-            this.listFiles.BeginInvoke((MethodInvoker)delegate ()
-            {
-                listFiles.Items.Clear();
-                foreach (DataMessage data in _DataMessage)
-                {
-                    listFiles.Items.Add($"[{data.Index}] - {data.Name}");
-                }
-            });
-        }
 
         private void btnReimport_Click(object sender, EventArgs e)
         {
@@ -110,21 +98,20 @@ namespace D3_Sqex03DataMessage
                 {
                     try
                     {
-                        Operation.Repack(_AppDirectory, _JsonConfig["GameLocation"], _DataMessage);
-                        _IsBusy = false;
+                        Operation.Repack(_AppDirectory, _JsonConfig["GameLocation"], _DataMessage, this.progressBar);
                     }
                     catch (Exception err)
                     {
                         _IsBusy = false;
                         MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
                     }
-                });
+                }).GetAwaiter().OnCompleted(() => { _IsBusy = false; });
             }
         }
 
         private void btnSelectGameLocation_Click(object sender, EventArgs e)
         {
-            string folderPath = FolderBrowser.FolderBrowserDialog("BLUS31197");
+            string folderPath = Diaglog.FolderBrowser("BLUS31197");
             if (!string.IsNullOrEmpty(folderPath))
             {
                 txtBoxGameLocation.Text = folderPath;
@@ -150,16 +137,11 @@ namespace D3_Sqex03DataMessage
 
         private void listFiles_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            Open_Preview();
-        }
-
-        private void Open_Preview()
-        {
-            if (listFiles.SelectedIndex < 0) return;
+            if (listFiles.SelectedIndex < 0 || _IsBusy ) return;
             int index = listFiles.SelectedIndex;
             try
             {
-                ViewUI view = new ViewUI();           
+                ViewUI view = new ViewUI();
                 DataMessage data = _DataMessage[index];
                 view.labelFileName.Text = data.Name;
                 view.labelIndex.Text = $"{index}";
@@ -175,35 +157,92 @@ namespace D3_Sqex03DataMessage
             }
         }
 
-        private void btnExport_Click(object sender, EventArgs e)
+        private void exportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (_DataMessage.Count() < 1 || _IsBusy)
+            if (_DataMessage.Count() < 0 || _IsBusy || listFiles.SelectedIndex <= -1) return;
+            _IsBusy = true;
+            Task.Run(() =>
             {
-                string msg = _IsBusy ? "Another task is already in progress." : "There's no data to export.";
-                MessageBox.Show(msg, _MessageBoxTitle);
-            }
-            else
-            {
-                _IsBusy = true;
-                string export_dir = FolderBrowser.FolderBrowserDialog("Export (Directory)");
-                if (!string.IsNullOrEmpty(export_dir))
+                try
                 {
-                    Task.Run(() =>
-                    {
-                        try
-                        {
-                            Operation.Export(export_dir, _DataMessage, this);
-                            _IsBusy = false;
-                        }
-                        catch (Exception err)
-                        {
-                            _IsBusy = false;
-                            MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
-                        }
-                    });
+                    Operation.Export(_DataMessage[listFiles.SelectedIndex], this.progressBar);
                 }
-            }
+                catch (Exception err)
+                {
+                    _IsBusy = false;
+                    MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
+                }
+            }).GetAwaiter().OnCompleted(() => { _IsBusy = false; });
+        }
+
+        private void importToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_DataMessage.Count() < 0 || _IsBusy || listFiles.SelectedIndex <= -1) return;
+            int index = listFiles.SelectedIndex;
+            string file_name = $"[${_DataMessage[index].Index}] {_DataMessage[index].Name}";
+            string file_import = Diaglog.FileBrowser(file_name, "Text files (*.txt)|*.txt|All files (*.*)|*.*");
+            if (string.IsNullOrEmpty(file_import)) return;
+            _IsBusy = true;
+            Task.Run(() =>
+            {
+                try
+                {
+                    double percent = 100.0 / _DataMessage[index].Strings.Count;
+                    string[] lines = File.ReadAllLines(file_import);
+                    for (int i = 0; i < _DataMessage[index].Strings.Count; i++)
+                    {
+                        _DataMessage[index].Strings[i] = lines[i];
+                        percent += 100.0 / _DataMessage[index].Strings.Count;
+                        Operation.ProgressBar(this.progressBar, (int)percent);
+                    }
+                }
+                catch (Exception err)
+                {
+                    _IsBusy = false;
+                    MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
+                }
+            }).GetAwaiter().OnCompleted(() => { _IsBusy = false; });
+        }
+
+        private void exportAllStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_DataMessage.Count() < 0 || _IsBusy) return;
+            string export_dir = Diaglog.FolderBrowser("Export (Directory)");
+            if (string.IsNullOrEmpty(export_dir)) return;
+            _IsBusy = true;
+            Task.Run(() =>
+            {
+                try
+                {
+                    Operation.ExportAll(export_dir, _DataMessage, this.progressBar);
+                }
+                catch (Exception err)
+                {
+                    _IsBusy = false;
+                    MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
+                }
+            }).GetAwaiter().OnCompleted(() => { _IsBusy = false; });
             
+        }
+
+        private void importAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_DataMessage.Count() < 0 || _IsBusy ) return;
+            string json_file = Diaglog.FileBrowser("export.json", "JSON files (*.json)|*.json");
+            if (string.IsNullOrEmpty(json_file)) return;
+            _IsBusy = true;
+            Task.Run(() =>
+            {
+                try
+                {
+                    Operation.ImportAll(json_file, this.progressBar);
+                }
+                catch (Exception err)
+                {
+                    _IsBusy = false;
+                    MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
+                }
+            }).GetAwaiter().OnCompleted(() => { _IsBusy = false; });
         }
     }
 }

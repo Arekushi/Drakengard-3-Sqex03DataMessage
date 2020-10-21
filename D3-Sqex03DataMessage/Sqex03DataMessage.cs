@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Be.IO;
+using System.Runtime.CompilerServices;
+using System.Windows.Forms;
 
 namespace D3_Sqex03DataMessage
 {
@@ -113,7 +115,6 @@ namespace D3_Sqex03DataMessage
                             if (reader.ReadUInt32() > 0) reader.BaseStream.Position += 4;
                             reader.BaseStream.Position += 20;
                             current = reader.BaseStream.Position;
-                            
                             if (index_type == 2) //Sqex03DataMessage
                             {
                                 reader.BaseStream.Position = offset;
@@ -152,12 +153,12 @@ namespace D3_Sqex03DataMessage
                         byte[] decompressed_data = Decompress(input, (uint)reader.BaseStream.Position);
                         return Decrypt(decompressed_data);
                     default:
-                        throw new Exception("Compression type is not supported.");
+                        throw new Exception("The file has an unsupported compression type.");
                 }
             }
             else
             {
-                throw new Exception("File is not a Drakengard 3 (Unreal 3) file.");
+                throw new Exception("The file is not a Drakengard 3 (Unreal 3) file.");
             }
             reader.Close();
             return result;
@@ -243,9 +244,9 @@ namespace D3_Sqex03DataMessage
                                 int new_str_length = 0;
                                 MemoryStream temp = new MemoryStream();
                                 BeBinaryWriter writer_temp = new BeBinaryWriter(temp);
-                                foreach (string line in strings) 
+                                for (int line = 0; line < (long)total_lines; line++)
                                 {
-                                    string line_str = line;
+                                    string line_str = strings[line];
                                     for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
                                     {
                                         line_str = line_str.Replace(ArchiveConfig.ReplaceChars[k], ArchiveConfig.OriginalChars[k]);
@@ -300,12 +301,12 @@ namespace D3_Sqex03DataMessage
                         byte[] decompressed_data = Decompress(input, (uint)reader.BaseStream.Position);
                         return Reimport(decompressed_data, data);
                     default:
-                        throw new Exception("Compression type is not supported.");
+                        throw new Exception("The file has an unsupported compression type.");
                 }
             }
             else
             {
-                throw new Exception("File is not a Drakengard 3 (Unreal 3) file.");
+                throw new Exception("The file is not a Drakengard 3 (Unreal 3) file.");
             }
             reader.Close();
             writer.Close();
