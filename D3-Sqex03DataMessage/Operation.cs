@@ -69,8 +69,9 @@ namespace D3_Sqex03DataMessage
 
         public static void Export(DataMessage data_message, ProgressBar progressBar)
         {
+            ProgressBar(progressBar, 0);
             byte[] data = Encoding.UTF8.GetBytes(String.Join("\r\n", data_message.Strings.ToArray()));
-            Diaglog.SaveFile($"[{data_message.Index}] {data_message.Name}", data, "Text files (*.txt)|*.txt|All files (*.*)|*.*");
+            DiaglogManager.SaveFile($"[{data_message.Index}] {data_message.Name}", data, "Text files (*.txt)|*.txt|All files (*.*)|*.*");
             ProgressBar(progressBar, 100);
         }
 

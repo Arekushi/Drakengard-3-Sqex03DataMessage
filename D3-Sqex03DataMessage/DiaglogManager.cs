@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.IO;
+using System.Threading;
 
 namespace D3_Sqex03DataMessage
 {
-    class Diaglog
+    class DiaglogManager
     {
         public static string FolderBrowser(string filename)
         {
@@ -23,13 +24,19 @@ namespace D3_Sqex03DataMessage
 
         public static void SaveFile(string name, byte[] data, string filter)
         {
-            SaveFileDialog savefile = new SaveFileDialog();
-            savefile.FileName = name;
-            savefile.Filter = filter;
-            if (savefile.ShowDialog() == DialogResult.OK)
+            Thread newThread = new Thread(new ThreadStart(() =>
             {
-                File.WriteAllBytes(savefile.FileName, data);
-            }
+                SaveFileDialog savefile = new SaveFileDialog();
+                savefile.FileName = name;
+                savefile.Filter = filter;
+                if (savefile.ShowDialog() == DialogResult.OK)
+                {
+                    File.WriteAllBytes(savefile.FileName, data);
+                }
+            }));
+            newThread.SetApartmentState(ApartmentState.STA);
+            newThread.Start();
+            newThread.Join();
         }
 
         public static string FileBrowser(string filename, string filter)

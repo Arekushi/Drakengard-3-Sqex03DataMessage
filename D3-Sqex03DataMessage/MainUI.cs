@@ -111,7 +111,7 @@ namespace D3_Sqex03DataMessage
 
         private void btnSelectGameLocation_Click(object sender, EventArgs e)
         {
-            string folderPath = Diaglog.FolderBrowser("BLUS31197");
+            string folderPath = DiaglogManager.FolderBrowser("BLUS31197");
             if (!string.IsNullOrEmpty(folderPath))
             {
                 txtBoxGameLocation.Text = folderPath;
@@ -161,11 +161,12 @@ namespace D3_Sqex03DataMessage
         {
             if (_DataMessage.Count() < 0 || _IsBusy || listFiles.SelectedIndex <= -1) return;
             _IsBusy = true;
+            int index = listFiles.SelectedIndex;
             Task.Run(() =>
             {
                 try
                 {
-                    Operation.Export(_DataMessage[listFiles.SelectedIndex], this.progressBar);
+                    Operation.Export(_DataMessage[index], this.progressBar);
                 }
                 catch (Exception err)
                 {
@@ -180,7 +181,7 @@ namespace D3_Sqex03DataMessage
             if (_DataMessage.Count() < 0 || _IsBusy || listFiles.SelectedIndex <= -1) return;
             int index = listFiles.SelectedIndex;
             string file_name = $"[${_DataMessage[index].Index}] {_DataMessage[index].Name}";
-            string file_import = Diaglog.FileBrowser(file_name, "Text files (*.txt)|*.txt|All files (*.*)|*.*");
+            string file_import = DiaglogManager.FileBrowser(file_name, "Text files (*.txt)|*.txt|All files (*.*)|*.*");
             if (string.IsNullOrEmpty(file_import)) return;
             _IsBusy = true;
             Task.Run(() =>
@@ -207,7 +208,7 @@ namespace D3_Sqex03DataMessage
         private void exportAllStripMenuItem_Click(object sender, EventArgs e)
         {
             if (_DataMessage.Count() < 0 || _IsBusy) return;
-            string export_dir = Diaglog.FolderBrowser("Export (Directory)");
+            string export_dir = DiaglogManager.FolderBrowser("Export (Directory)");
             if (string.IsNullOrEmpty(export_dir)) return;
             _IsBusy = true;
             Task.Run(() =>
@@ -228,7 +229,7 @@ namespace D3_Sqex03DataMessage
         private void importAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (_DataMessage.Count() < 0 || _IsBusy ) return;
-            string json_file = Diaglog.FileBrowser("export.json", "JSON files (*.json)|*.json");
+            string json_file = DiaglogManager.FileBrowser("export.json", "JSON files (*.json)|*.json");
             if (string.IsNullOrEmpty(json_file)) return;
             _IsBusy = true;
             Task.Run(() =>

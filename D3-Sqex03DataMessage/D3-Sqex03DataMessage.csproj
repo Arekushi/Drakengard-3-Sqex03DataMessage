@@ -71,7 +71,7 @@
     <Compile Include="BinaryReaderBE.cs" />
     <Compile Include="CompressedChunk.cs" />
     <Compile Include="DataMessage.cs" />
-    <Compile Include="Diaglog.cs" />
+    <Compile Include="DiaglogManager.cs" />
     <Compile Include="MainUI.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -126,10 +126,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Drakengard3.ico" />
+    <Content Include="Drakengard3.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Drakengard3.ico" />
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
