@@ -20,12 +20,12 @@ namespace D3_Sqex03DataMessage
             '\u0001'.ToString(), '\u0003'.ToString(), '\u0004'.ToString(), '\u0005'.ToString(),
             '\u0006'.ToString(), '\u0008'.ToString(), '\u0009'.ToString(), '\u0010'.ToString(),
             '\u000a'.ToString(), '\u000b'.ToString(), '\u000c'.ToString(), '\u000d'.ToString(),
-            '\u000f'.ToString(), '\u25b2'.ToString(), '\u25bc'.ToString(), '\uFDFF'.ToString()
+            '\u000f'.ToString(), '\u25b2'.ToString(), '\u25bc'.ToString()
         };
         public static readonly string[] ReplaceChars = new string[]
         {
-            "{01}", "{03}", "{04}", "{05}", "{06}", "{08}", "{09}", "{10}", "{0A}", "{0B}", "{0C}",
-            "{0D}", "{0F}", "{25B2}", "{25BC}", "{FDFF}"
+            "{01}", "{03}", "{04}", "{LF}", "{06}", "{08}", "{09}", "{10}", "{0A}", "{0B}", "{0C}",
+            "{0D}", "{0F}", "{25B2}", "{25BC}"
         };
     }
 }

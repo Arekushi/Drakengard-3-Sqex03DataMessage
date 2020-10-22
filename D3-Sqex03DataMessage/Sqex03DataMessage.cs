@@ -136,7 +136,7 @@ namespace D3_Sqex03DataMessage
                                         zero_bytes = 2;
                                     }
                                     
-                                    string str = zero_bytes < 2 ? Encoding.UTF8.GetString(reader.ReadBytes((int)str_length - zero_bytes)) : Encoding.Unicode.GetString(reader.ReadBytes((int)str_length));
+                                    string str = zero_bytes < 2 ? Encoding.GetEncoding(1252).GetString(reader.ReadBytes((int)str_length - zero_bytes)) : Encoding.Unicode.GetString(reader.ReadBytes((int)str_length));
                                     for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
                                     {
                                         str = str.Replace(ArchiveConfig.OriginalChars[k], ArchiveConfig.ReplaceChars[k]);
