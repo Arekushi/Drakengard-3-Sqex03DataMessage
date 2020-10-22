@@ -67,12 +67,10 @@ namespace D3_Sqex03DataMessage
             File.WriteAllText(Path.Combine(export_dir, "export.json"), json_content);
         }
 
-        public static void Export(DataMessage data_message, ProgressBar progressBar)
+        public static void Export(DataMessage data_message)
         {
-            ProgressBar(progressBar, 0);
             byte[] data = Encoding.UTF8.GetBytes(String.Join("\r\n", data_message.Strings.ToArray()));
             DiaglogManager.SaveFile($"[{data_message.Index}] {data_message.Name}", data, "Text files (*.txt)|*.txt|All files (*.*)|*.*");
-            ProgressBar(progressBar, 100);
         }
 
         public static void ImportAll(string json_file, ProgressBar progressBar)

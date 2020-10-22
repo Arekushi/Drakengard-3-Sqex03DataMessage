@@ -166,7 +166,7 @@ namespace D3_Sqex03DataMessage
             {
                 try
                 {
-                    Operation.Export(_DataMessage[index], this.progressBar);
+                    Operation.Export(_DataMessage[index]);
                 }
                 catch (Exception err)
                 {
