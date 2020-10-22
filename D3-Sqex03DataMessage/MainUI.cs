@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Web.Script.Serialization;
-using System.Reflection;
-using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace D3_Sqex03DataMessage
 {
@@ -244,6 +243,15 @@ namespace D3_Sqex03DataMessage
                     MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
                 }
             }).GetAwaiter().OnCompleted(() => { _IsBusy = false; });
+        }
+
+        private void linkLabelGit_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("https://github.com/lehieugch68/Drakengard-3-Sqex03DataMessage");
+        }
+        private void linkLabelVHG_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("https://viethoagame.com/");
         }
     }
 }

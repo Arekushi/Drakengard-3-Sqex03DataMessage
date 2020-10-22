@@ -170,6 +170,7 @@
             this.linkLabelGit.TabIndex = 15;
             this.linkLabelGit.TabStop = true;
             this.linkLabelGit.Text = "Github";
+            this.linkLabelGit.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelGit_LinkClicked);
             // 
             // linkLabelVHG
             // 
@@ -181,6 +182,7 @@
             this.linkLabelVHG.TabIndex = 16;
             this.linkLabelVHG.TabStop = true;
             this.linkLabelVHG.Text = "VietHoaGame";
+            this.linkLabelVHG.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelVHG_LinkClicked);
             // 
             // MainUI
             // 

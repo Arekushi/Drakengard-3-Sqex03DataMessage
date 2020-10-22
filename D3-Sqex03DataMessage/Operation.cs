@@ -56,10 +56,11 @@ namespace D3_Sqex03DataMessage
             Dictionary<string, string> json = new Dictionary<string, string>();
             foreach (DataMessage data in data_message)
             {
-                string file = Path.Combine(export_dir, $"[{data.Index}] {data.Name}.txt");
+                string filename = $"[{data.Index}] {data.Name}.txt";
+                string file = Path.Combine(export_dir, filename);
                 string content = String.Join("\r\n", data.Strings.ToArray());
                 File.WriteAllText(file, content);
-                json.Add($"{data.Index}", file);
+                json.Add($"{data.Index}", filename);
                 percent += 100.0 / data_message.Count;
                 ProgressBar(progressBar, (int)percent);
             }
@@ -82,8 +83,8 @@ namespace D3_Sqex03DataMessage
                 DataMessage data = MainUI._DataMessage.Find(e => e.Index == uint.Parse(entry.Key));
                 percent += 100.0 / dict.Count;
                 ProgressBar(progressBar, (int)percent);
-                if (data == null) continue;
-                string[] lines = File.ReadAllLines(entry.Value);
+                if (data == null||!File.Exists(Path.Combine(Path.GetDirectoryName(json_file), entry.Value))) continue;
+                string[] lines = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(json_file), entry.Value));
                 for (int i = 0; i < data.Strings.Count; i++)
                 {
                     data.Strings[i] = lines[i];
