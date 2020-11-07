@@ -35,5 +35,11 @@ namespace D3_Sqex03DataMessage
             if (e.RowIndex > MainUI._DataMessage[index].Strings.Count-1) return;
             MainUI._DataMessage[index].Strings[e.RowIndex] = $"{dataGridView.Rows[e.RowIndex].Cells[1].Value}";
         }
+
+        private void ViewUI_FromClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+            this.Hide();
+        }
     }
 }

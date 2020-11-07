@@ -72,6 +72,7 @@
     <Compile Include="CompressedChunk.cs" />
     <Compile Include="DataMessage.cs" />
     <Compile Include="DiaglogManager.cs" />
+    <Compile Include="Editor.cs" />
     <Compile Include="MainUI.cs">
       <SubType>Form</SubType>
     </Compile>

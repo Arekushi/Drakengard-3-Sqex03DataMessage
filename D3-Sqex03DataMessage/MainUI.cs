@@ -18,6 +18,7 @@ namespace D3_Sqex03DataMessage
         string _AppDirectory = AppDomain.CurrentDomain.BaseDirectory;
         string _ConfigFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config", "config.json");
         string _MessageBoxTitle = "D3 Sqex03DataMessage";
+        Editor _Editor = Editor.Instance();
         bool _IsBusy = false;
         public static List<DataMessage> _DataMessage = new List<DataMessage>();
         Dictionary<string, string> _JsonConfig = new Dictionary<string, string>();
@@ -140,15 +141,9 @@ namespace D3_Sqex03DataMessage
             int index = listFiles.SelectedIndex;
             try
             {
-                ViewUI view = new ViewUI();
                 DataMessage data = _DataMessage[index];
-                view.labelFileName.Text = data.Name;
-                view.labelIndex.Text = $"{index}";
-                for (int i = 0; i < data.Strings.Count; i++)
-                {
-                    view.dataGridView.Rows.Add($"{i}", data.Strings[i]);
-                }
-                view.Show();
+                ViewUI editor = _Editor.TransferData(data);
+                if (!editor.Visible) editor.Show();
             }
             catch (Exception err)
             {
@@ -158,7 +153,7 @@ namespace D3_Sqex03DataMessage
 
         private void exportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (_DataMessage.Count() < 0 || _IsBusy || listFiles.SelectedIndex <= -1) return;
+            if (_DataMessage.Count() <= 0 || _IsBusy || listFiles.SelectedIndex <= -1) return;
             _IsBusy = true;
             int index = listFiles.SelectedIndex;
             Task.Run(() =>
@@ -177,7 +172,7 @@ namespace D3_Sqex03DataMessage
 
         private void importToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (_DataMessage.Count() < 0 || _IsBusy || listFiles.SelectedIndex <= -1) return;
+            if (_DataMessage.Count() <= 0 || _IsBusy || listFiles.SelectedIndex <= -1) return;
             int index = listFiles.SelectedIndex;
             string file_name = $"[${_DataMessage[index].Index}] {_DataMessage[index].Name}";
             string file_import = DiaglogManager.FileBrowser(file_name, "Text files (*.txt)|*.txt|All files (*.*)|*.*");
@@ -206,7 +201,12 @@ namespace D3_Sqex03DataMessage
 
         private void exportAllStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (_DataMessage.Count() < 0 || _IsBusy) return;
+            Extract(false);
+            
+        }
+        private void Extract(bool merge)
+        {
+            if (_DataMessage.Count() <= 0 || _IsBusy) return;
             string export_dir = DiaglogManager.FolderBrowser("Export (Directory)");
             if (string.IsNullOrEmpty(export_dir)) return;
             _IsBusy = true;
@@ -214,7 +214,7 @@ namespace D3_Sqex03DataMessage
             {
                 try
                 {
-                    Operation.ExportAll(export_dir, _DataMessage, this.progressBar);
+                    Operation.ExportAll(export_dir, _DataMessage, merge, this.progressBar);
                 }
                 catch (Exception err)
                 {
@@ -222,12 +222,11 @@ namespace D3_Sqex03DataMessage
                     MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
                 }
             }).GetAwaiter().OnCompleted(() => { _IsBusy = false; });
-            
         }
 
         private void importAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (_DataMessage.Count() < 0 || _IsBusy ) return;
+            if (_DataMessage.Count() <= 0 || _IsBusy ) return;
             string json_file = DiaglogManager.FileBrowser("export.json", "JSON files (*.json)|*.json");
             if (string.IsNullOrEmpty(json_file)) return;
             _IsBusy = true;
@@ -252,6 +251,11 @@ namespace D3_Sqex03DataMessage
         private void linkLabelVHG_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Process.Start("https://viethoagame.com/");
+        }
+
+        private void exportAllOneFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Extract(true);
         }
     }
 }

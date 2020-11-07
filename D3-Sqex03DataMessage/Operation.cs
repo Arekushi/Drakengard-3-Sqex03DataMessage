@@ -49,20 +49,44 @@ namespace D3_Sqex03DataMessage
             }
             return result;
         }
-
-        public static void ExportAll(string export_dir, List<DataMessage> data_message, ProgressBar progressBar)
+        struct ExportJson
+        {
+            public bool Merge;
+            public string Archive;
+            public Dictionary<string, string> Files;
+        }
+        public static void ExportAll(string export_dir, List<DataMessage> data_message, bool merge, ProgressBar progressBar)
         {
             double percent = 100.0 / data_message.Count;
-            Dictionary<string, string> json = new Dictionary<string, string>();
-            foreach (DataMessage data in data_message)
+            ExportJson json = new ExportJson();
+            json.Merge = merge;
+            json.Files = new Dictionary<string, string>();
+            json.Archive = merge ? "Sqex03DataMessage.txt" : null;
+            if (merge)
             {
-                string filename = $"[{data.Index}] {data.Name}.txt";
-                string file = Path.Combine(export_dir, filename);
-                string content = String.Join("\r\n", data.Strings.ToArray());
-                File.WriteAllText(file, content);
-                json.Add($"{data.Index}", filename);
-                percent += 100.0 / data_message.Count;
-                ProgressBar(progressBar, (int)percent);
+                List<string> content = new List<string>();
+                foreach (DataMessage data in data_message)
+                {
+                    string data_strings = String.Join("\r\n", data.Strings.ToArray());
+                    content.Add(data_strings);
+                    json.Files.Add($"{data.Index}", $"{data.Strings.Count}");
+                    percent += 100.0 / data_message.Count;
+                    ProgressBar(progressBar, (int)percent);
+                }
+                File.WriteAllText(Path.Combine(export_dir, json.Archive), String.Join("\r\n", content.ToArray()));
+            }
+            else
+            {
+                foreach (DataMessage data in data_message)
+                {
+                    string filename = $"[{data.Index}] {data.Name}.txt";
+                    string file = Path.Combine(export_dir, filename);
+                    string content = String.Join("\r\n", data.Strings.ToArray());
+                    File.WriteAllText(file, content);
+                    json.Files.Add($"{data.Index}", filename);
+                    percent += 100.0 / data_message.Count;
+                    ProgressBar(progressBar, (int)percent);
+                }
             }
             string json_content = new JavaScriptSerializer().Serialize(json);
             File.WriteAllText(Path.Combine(export_dir, "export.json"), json_content);
@@ -76,18 +100,39 @@ namespace D3_Sqex03DataMessage
 
         public static void ImportAll(string json_file, ProgressBar progressBar)
         {
-            Dictionary<string, string> dict = new JavaScriptSerializer().Deserialize<Dictionary<string, string>>(File.ReadAllText(json_file));
-            double percent = 100.0 / dict.Count;
-            foreach (KeyValuePair<string, string> entry in dict)
+            dynamic export_config = new JavaScriptSerializer().Deserialize<dynamic>(File.ReadAllText(json_file));
+            double percent = 100.0 / export_config["Files"].Count;
+            if ((bool)export_config["Merge"] == true)
             {
-                DataMessage data = MainUI._DataMessage.Find(e => e.Index == uint.Parse(entry.Key));
-                percent += 100.0 / dict.Count;
-                ProgressBar(progressBar, (int)percent);
-                if (data == null||!File.Exists(Path.Combine(Path.GetDirectoryName(json_file), entry.Value))) continue;
-                string[] lines = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(json_file), entry.Value));
-                for (int i = 0; i < data.Strings.Count; i++)
+                string[] strings = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(json_file), export_config["Archive"]));
+                int line = 0;
+                foreach (KeyValuePair<string, object> entry in export_config["Files"])
                 {
-                    data.Strings[i] = lines[i];
+                    DataMessage data = MainUI._DataMessage.Find(e => e.Index == int.Parse(entry.Key));
+                    int start = line;
+                    int index = 0;
+                    line += int.Parse($"{entry.Value}");
+                    for (int i = start; i < line; i++, index++)
+                    {
+                        data.Strings[index] = strings[i];
+                    }
+                    percent += 100.0 / export_config["Files"].Count;
+                    ProgressBar(progressBar, (int)percent);
+                }
+            }
+            else
+            {
+                foreach (KeyValuePair<string, object> entry in export_config["Files"])
+                {
+                    DataMessage data = MainUI._DataMessage.Find(e => e.Index == int.Parse(entry.Key));
+                    percent += 100.0 / export_config["Files"].Count;
+                    ProgressBar(progressBar, (int)percent);
+                    if (data == null || !File.Exists(Path.Combine(Path.GetDirectoryName(json_file), $"{entry.Value}"))) continue;
+                    string[] lines = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(json_file), $"{entry.Value}"));
+                    for (int i = 0; i < data.Strings.Count; i++)
+                    {
+                        data.Strings[i] = lines[i];
+                    }
                 }
             }
         }
