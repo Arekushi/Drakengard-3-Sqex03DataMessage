@@ -13,10 +13,10 @@ namespace D3_Sqex03DataMessage
         public UInt32 CompressedOffset { get; set; }
         public UInt32 CompressedSize { get; set; }
 
-        public CompressedChunk (UInt32 uncompressedOffset, UInt32 uncompressedsize, UInt32 compressedOffset, UInt32 compressedSize)
+        public CompressedChunk (UInt32 uncompressedOffset, UInt32 uncompressedSize, UInt32 compressedOffset, UInt32 compressedSize)
         {
             UncompressedOffset = uncompressedOffset;
-            UncompressedSize = uncompressedsize;
+            UncompressedSize = uncompressedSize;
             CompressedOffset = compressedOffset;
             CompressedSize = compressedSize;
         }
