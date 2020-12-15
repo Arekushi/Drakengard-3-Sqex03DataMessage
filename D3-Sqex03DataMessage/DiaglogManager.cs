@@ -26,12 +26,12 @@ namespace D3_Sqex03DataMessage
         {
             Thread newThread = new Thread(new ThreadStart(() =>
             {
-                SaveFileDialog savefile = new SaveFileDialog();
-                savefile.FileName = name;
-                savefile.Filter = filter;
-                if (savefile.ShowDialog() == DialogResult.OK)
+                SaveFileDialog saveFile = new SaveFileDialog();
+                saveFile.FileName = name;
+                saveFile.Filter = filter;
+                if (saveFile.ShowDialog() == DialogResult.OK)
                 {
-                    File.WriteAllBytes(savefile.FileName, data);
+                    File.WriteAllBytes(saveFile.FileName, data);
                 }
             }));
             newThread.SetApartmentState(ApartmentState.STA);

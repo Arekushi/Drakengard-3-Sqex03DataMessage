@@ -39,8 +39,8 @@ namespace D3_Sqex03DataMessage
         {
             
             List<DataMessage> result = new List<DataMessage>();
-            string bak_dir = Path.Combine(app_dir, "Backup");
-            Backup(game_dir, bak_dir);
+            /*string bak_dir = Path.Combine(app_dir, "Backup");
+            Backup(game_dir, bak_dir);*/
             string archive = Directory.GetFiles(game_dir, "*.XXX", SearchOption.AllDirectories)
                     .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).FirstOrDefault();
             if (!string.IsNullOrEmpty(archive))
@@ -139,8 +139,8 @@ namespace D3_Sqex03DataMessage
 
         public static void Repack(string app_dir, string game_dir, List<DataMessage> data, ProgressBar progressBar)
         {
-            string bak_dir = Path.Combine(app_dir, "Backup");
-            Backup(game_dir, bak_dir);
+            /*string bak_dir = Path.Combine(app_dir, "Backup");
+            Backup(game_dir, bak_dir);*/
             List<string> archives = Directory.GetFiles(game_dir, "*.XXX", SearchOption.AllDirectories)
                     .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).ToList();
             string toc = Directory.GetFiles(game_dir, "*.txt", SearchOption.AllDirectories)

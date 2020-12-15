@@ -16,45 +16,45 @@ namespace D3_Sqex03DataMessage
             MemoryStream stream = new MemoryStream(input);
             BinaryReaderBE reader = new BinaryReaderBE(stream);
             reader.BaseStream.Position = offset;
-            UInt32 chunk_count = reader.ReadUInt32();
+            UInt32 chunkCount = reader.ReadUInt32();
             long position = reader.BaseStream.Position;
-            List<CompressedChunk> total_chunk = new List<CompressedChunk>();
-            for (int i = 0; i < chunk_count; i++)
+            List<CompressedChunk> totalChunk = new List<CompressedChunk>();
+            for (int i = 0; i < chunkCount; i++)
             {
                 reader.BaseStream.Position = position;
-                UInt32 uncompressed_offset = reader.ReadUInt32();
-                UInt32 uncompressed_size = reader.ReadUInt32();
-                UInt32 compressed_offset = reader.ReadUInt32();
-                UInt32 compressed_size = reader.ReadUInt32();
+                UInt32 uncompressedOffset = reader.ReadUInt32();
+                UInt32 uncompressedSize = reader.ReadUInt32();
+                UInt32 compressedOffset = reader.ReadUInt32();
+                UInt32 compressedSize = reader.ReadUInt32();
                 position = reader.BaseStream.Position;
-                reader.BaseStream.Position = compressed_offset;
-                byte[] compressed_data = reader.ReadBytes((int)compressed_size);
-                CompressedChunk chunk = new CompressedChunk(uncompressed_offset, uncompressed_size, compressed_offset, compressed_size);
-                chunk.Decompress(compressed_data);
-                total_chunk.Add(chunk);
+                reader.BaseStream.Position = compressedOffset;
+                byte[] compressedData = reader.ReadBytes((int)compressedSize);
+                CompressedChunk chunk = new CompressedChunk(uncompressedOffset, uncompressedSize, compressedOffset, compressedSize);
+                chunk.Decompress(compressedData);
+                totalChunk.Add(chunk);
             }
             MemoryStream result = new MemoryStream();
             BinaryWriter writer = new BinaryWriter(result);
-            long unknow_position = position;
+            long unknowPosition = position;
             reader.BaseStream.Position = 0;
             writer.Write(reader.ReadBytes((int)ArchiveConfig.PackageFlagsOffset));
             writer.Write(ArchiveConfig.UncompressedFlagsBytes);
             reader.BaseStream.Position += 4;
             writer.Write(reader.ReadBytes((int)(ArchiveConfig.CompressionTypeOffset - ArchiveConfig.PackageFlagsOffset - 4)));
             writer.Write(new byte[8]);
-            reader.BaseStream.Position = unknow_position;
+            reader.BaseStream.Position = unknowPosition;
             writer.Write(reader.ReadBytes(8));
             position = ArchiveConfig.CompressionTypeOffset + 16;
-            foreach (CompressedChunk chunk in total_chunk)
+            foreach (CompressedChunk chunk in totalChunk)
             {
-                if (chunk.Uncompressed_Offset > position)
+                if (chunk.UncompressedOffset > position)
                 {
-                    long d = chunk.Uncompressed_Offset - position;
-                    writer.Write(new byte[d]);
-                    position = chunk.Uncompressed_Offset;
+                    long zeroes = chunk.UncompressedOffset - position;
+                    writer.Write(new byte[zeroes]);
+                    position = chunk.UncompressedOffset;
                 }
-                writer.Write(chunk.Uncompressed_Data);
-                position += chunk.Uncompressed_Size;
+                writer.Write(chunk.UncompressedData);
+                position += chunk.UncompressedSize;
             }
             writer.Close();
             reader.Close();
@@ -69,45 +69,45 @@ namespace D3_Sqex03DataMessage
             if (reader.ReadUInt32() == ArchiveConfig.Signature)
             {
                 reader.BaseStream.Position = ArchiveConfig.CompressionTypeOffset;
-                UInt32 compress_type = reader.ReadUInt32();
-                switch (compress_type)
+                UInt32 compressType = reader.ReadUInt32();
+                switch (compressType)
                 {
                     case 0:
                         reader.BaseStream.Position = ArchiveConfig.TableOffset;
 
-                        UInt32 name_count = reader.ReadUInt32();
-                        UInt32 name_offset = reader.ReadUInt32();
-                        UInt32 export_count = reader.ReadUInt32();
-                        UInt32 export_offset = reader.ReadUInt32();
-                        UInt32 import_count = reader.ReadUInt32();
-                        UInt32 import_offset = reader.ReadUInt32();
+                        UInt32 nameCount = reader.ReadUInt32();
+                        UInt32 nameOffset = reader.ReadUInt32();
+                        UInt32 exportCount = reader.ReadUInt32();
+                        UInt32 exportOffset = reader.ReadUInt32();
+                        UInt32 importCount = reader.ReadUInt32();
+                        UInt32 importOffset = reader.ReadUInt32();
 
-                        string[] name_table = new string[name_count];
-                        reader.BaseStream.Position = name_offset;
-                        for (int i = 0; i < name_count; i++)
+                        string[] nameTable = new string[nameCount];
+                        reader.BaseStream.Position = nameOffset;
+                        for (int i = 0; i < nameCount; i++)
                         {
-                            UInt32 str_length = reader.ReadUInt32();
-                            name_table[i] = Encoding.UTF8.GetString(reader.ReadBytes((int)str_length - 1));
+                            UInt32 strLength = reader.ReadUInt32();
+                            nameTable[i] = Encoding.UTF8.GetString(reader.ReadBytes((int)strLength - 1));
                             reader.BaseStream.Position += 9;
                         }
-                        string[] name_import = new string[import_count];
-                        reader.BaseStream.Position = import_offset;
-                        for (int i = 0; i < import_count; i++)
+                        string[] nameImport = new string[importCount];
+                        reader.BaseStream.Position = importOffset;
+                        for (int i = 0; i < importCount; i++)
                         {
                             reader.BaseStream.Position += 20;
                             UInt32 index = reader.ReadUInt32();
-                            name_import[i] = name_table[(int)index];
+                            nameImport[i] = nameTable[(int)index];
                             reader.BaseStream.Position += 4;
                         }
-                        reader.BaseStream.Position = export_offset;
+                        reader.BaseStream.Position = exportOffset;
                         long current = reader.BaseStream.Position;
-                        for (int i = 0; i < export_count; i++)
+                        for (int i = 0; i < exportCount; i++)
                         {
                             reader.BaseStream.Position = current;
-                            uint index_type = (uint)reader.ReadInt32() ^ 0xFFFFFFFF;
+                            uint indexType = (uint)reader.ReadInt32() ^ 0xFFFFFFFF;
                             reader.BaseStream.Position += 8;
-                            UInt32 name_index = reader.ReadUInt32();
-                            string name = name_table[(int)name_index];
+                            UInt32 nameIndex = reader.ReadUInt32();
+                            string name = nameTable[(int)nameIndex];
                             reader.BaseStream.Position += 16;
                             UInt32 size = reader.ReadUInt32();
                             UInt32 offset = reader.ReadUInt32();
@@ -115,43 +115,43 @@ namespace D3_Sqex03DataMessage
                             if (reader.ReadUInt32() > 0) reader.BaseStream.Position += 4;
                             reader.BaseStream.Position += 20;
                             current = reader.BaseStream.Position;
-                            if (index_type == 2) //Sqex03DataMessage
+                            if (indexType == 2) //Sqex03DataMessage
                             {
                                 reader.BaseStream.Position = offset;
                                 UInt32 order = reader.ReadUInt32();
                                 if (ArchiveConfig.Skip.Contains(order)) continue;
                                 reader.BaseStream.Position += 68;
-                                UInt64 unknow_data_length = reader.ReadUInt64();
-                                reader.BaseStream.Position += (long)unknow_data_length + 16 + 8;
+                                UInt64 unknowDataLength = reader.ReadUInt64();
+                                reader.BaseStream.Position += (long)unknowDataLength + 16 + 8;
                                 List<string> strings = new List<string>();
-                                UInt64 total_lines = reader.ReadUInt64();
-                                for (int line = 0; line < (long)total_lines; line++)
+                                UInt64 totalLines = reader.ReadUInt64();
+                                for (int line = 0; line < (long)totalLines; line++)
                                 {
-                                    long str_length = reader.ReadInt32();
+                                    long strLength = reader.ReadInt32();
                                     
-                                    int zero_bytes = 1;
-                                    if (str_length < 0)
+                                    int zeroBytes = 1;
+                                    if (strLength < 0)
                                     {
-                                        str_length = (str_length^0xFFFFFFFF)*2;
-                                        zero_bytes = 2;
+                                        strLength = (strLength^0xFFFFFFFF)*2;
+                                        zeroBytes = 2;
                                     }
                                     
-                                    string str = zero_bytes < 2 ? Encoding.GetEncoding(1252).GetString(reader.ReadBytes((int)str_length - zero_bytes)) : Encoding.Unicode.GetString(reader.ReadBytes((int)str_length));
+                                    string str = zeroBytes < 2 ? Encoding.GetEncoding(1252).GetString(reader.ReadBytes((int)strLength - zeroBytes)) : Encoding.Unicode.GetString(reader.ReadBytes((int)strLength));
                                     for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
                                     {
                                         str = str.Replace(ArchiveConfig.OriginalChars[k], ArchiveConfig.ReplaceChars[k]);
                                     }
                                     strings.Add(str);
-                                    reader.BaseStream.Position += zero_bytes;
+                                    reader.BaseStream.Position += zeroBytes;
                                 }
-                                DataMessage data_message = new DataMessage(name, (int)order, strings);
-                                result.Add(data_message);
+                                DataMessage dataMessage = new DataMessage(name, (int)order, strings);
+                                result.Add(dataMessage);
                             }
                         }
                         break;
                     case 1:
-                        byte[] decompressed_data = Decompress(input, (uint)reader.BaseStream.Position);
-                        return Decrypt(decompressed_data);
+                        byte[] decompressedData = Decompress(input, (uint)reader.BaseStream.Position);
+                        return Decrypt(decompressedData);
                     default:
                         throw new Exception("The file has an unsupported compression type.");
                 }
@@ -171,8 +171,8 @@ namespace D3_Sqex03DataMessage
             {
                 strings.Add((uint)data.Index, data.Strings);
             }
-            byte[] original_file = File.ReadAllBytes(file);
-            byte[] result = Reimport(original_file, strings);
+            byte[] originalFile = File.ReadAllBytes(file);
+            byte[] result = Reimport(originalFile, strings);
             return result;
         }
 
@@ -184,122 +184,122 @@ namespace D3_Sqex03DataMessage
         private static byte[] Reimport (byte[] input, Dictionary<UInt32, List<string>> data)
         {
             MemoryStream result = new MemoryStream();
-            MemoryStream input_stream = new MemoryStream(input);
-            BinaryReaderBE reader = new BinaryReaderBE(input_stream);
+            MemoryStream inputStream = new MemoryStream(input);
+            BinaryReaderBE reader = new BinaryReaderBE(inputStream);
             BeBinaryWriter writer = new BeBinaryWriter(result);
 
             if (reader.ReadUInt32() == ArchiveConfig.Signature)
             {
                 reader.BaseStream.Position = ArchiveConfig.CompressionTypeOffset;
-                UInt32 compress_type = reader.ReadUInt32();
-                switch (compress_type)
+                UInt32 compressType = reader.ReadUInt32();
+                switch (compressType)
                 {
                     case 0:
                         reader.BaseStream.Position = ArchiveConfig.TableOffset;
 
-                        UInt32 name_count = reader.ReadUInt32();
-                        UInt32 name_offset = reader.ReadUInt32();
-                        UInt32 export_count = reader.ReadUInt32();
-                        UInt32 export_offset = reader.ReadUInt32();
-                        UInt32 import_count = reader.ReadUInt32();
-                        UInt32 import_offset = reader.ReadUInt32();
+                        UInt32 nameCount = reader.ReadUInt32();
+                        UInt32 nameOffset = reader.ReadUInt32();
+                        UInt32 exportCount = reader.ReadUInt32();
+                        UInt32 exportOffset = reader.ReadUInt32();
+                        UInt32 importCount = reader.ReadUInt32();
+                        UInt32 importOffset = reader.ReadUInt32();
 
                         reader.BaseStream.Position = 0;
-                        writer.Write(reader.ReadBytes((int)export_offset)); //header
+                        writer.Write(reader.ReadBytes((int)exportOffset)); //header
                         
-                        long bytes_changed = 0;
-                        List<byte[]> new_data = new List<byte[]>();
-                        long current = export_offset;
-                        for (int i = 0; i < export_count; i++)
+                        long bytesChanged = 0;
+                        List<byte[]> newData = new List<byte[]>();
+                        long current = exportOffset;
+                        for (int i = 0; i < exportCount; i++)
                         {
-                            MemoryStream new_real_data = new MemoryStream();
-                            BeBinaryWriter writer_data = new BeBinaryWriter(new_real_data);
+                            MemoryStream newRealData = new MemoryStream();
+                            BeBinaryWriter writerData = new BeBinaryWriter(newRealData);
                             reader.BaseStream.Position = current;
                             long start = reader.BaseStream.Position;
-                            uint index_type = (uint)reader.ReadInt32() ^ 0xFFFFFFFF;
+                            uint indexType = (uint)reader.ReadInt32() ^ 0xFFFFFFFF;
                             reader.BaseStream.Position += 28;
                             UInt32 size = reader.ReadUInt32();
                             UInt32 offset = reader.ReadUInt32();                            
-                            long new_offset = offset + bytes_changed;
+                            long newOffset = offset + bytesChanged;
                             reader.BaseStream.Position += 4;
                             if (reader.ReadUInt32() > 0) reader.BaseStream.Position += 4;
                             reader.BaseStream.Position += 20;
-                            long header_length = reader.BaseStream.Position - start;
+                            long headerLength = reader.BaseStream.Position - start;
                             current = reader.BaseStream.Position;
                             reader.BaseStream.Position = offset;
                             UInt32 order = reader.ReadUInt32();
 
                             reader.BaseStream.Position = offset;
                             List<string> strings;
-                            long string_bytes_changed = 0;
+                            long stringBytesChanged = 0;
                             
-                            if (index_type == 2 && !ArchiveConfig.Skip.Contains(order) && data.TryGetValue(order, out strings))
+                            if (indexType == 2 && !ArchiveConfig.Skip.Contains(order) && data.TryGetValue(order, out strings))
                             {
-                                writer_data.Write(reader.ReadBytes(72));
-                                UInt64 unknow_data_length = reader.ReadUInt64();
-                                writer_data.Write(unknow_data_length);
-                                writer_data.Write(reader.ReadBytes((int)unknow_data_length + 16));
-                                UInt64 old_size = reader.ReadUInt64();
-                                UInt64 total_lines = reader.ReadUInt64();
-                                int new_str_length = 0;
+                                writerData.Write(reader.ReadBytes(72));
+                                UInt64 unknowDataLength = reader.ReadUInt64();
+                                writerData.Write(unknowDataLength);
+                                writerData.Write(reader.ReadBytes((int)unknowDataLength + 16));
+                                UInt64 oldSize = reader.ReadUInt64();
+                                UInt64 totalLines = reader.ReadUInt64();
+                                int newStrLength = 0;
                                 MemoryStream temp = new MemoryStream();
-                                BeBinaryWriter writer_temp = new BeBinaryWriter(temp);
-                                for (int line = 0; line < (long)total_lines; line++)
+                                BeBinaryWriter writerTemp = new BeBinaryWriter(temp);
+                                for (int line = 0; line < (long)totalLines; line++)
                                 {
-                                    string line_str = strings[line];
+                                    string lineStr = strings[line];
                                     for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
                                     {
-                                        line_str = line_str.Replace(ArchiveConfig.ReplaceChars[k], ArchiveConfig.OriginalChars[k]);
+                                        lineStr = lineStr.Replace(ArchiveConfig.ReplaceChars[k], ArchiveConfig.OriginalChars[k]);
                                     }
-                                    long str_length = line_str.Length ^ 0xFFFFFFFF;
-                                    writer_temp.Write((Int32)str_length);
-                                    byte[] str = Encoding.Unicode.GetBytes(line_str);
-                                    writer_temp.Write(str);
-                                    writer_temp.Write(new byte[2]);
-                                    new_str_length += 4 + str.Length + 2;
+                                    long strLength = lineStr.Length ^ 0xFFFFFFFF;
+                                    writerTemp.Write((Int32)strLength);
+                                    byte[] str = Encoding.Unicode.GetBytes(lineStr);
+                                    writerTemp.Write(str);
+                                    writerTemp.Write(new byte[2]);
+                                    newStrLength += 4 + str.Length + 2;
                                 }
-                                writer_temp.Close();
-                                new_str_length += 4;
-                                string_bytes_changed = (long)new_str_length - (long)old_size;
-                                writer_data.Write((UInt64)new_str_length);
-                                writer_data.Write(total_lines);
-                                writer_data.Write(temp.ToArray());
-                                reader.BaseStream.Position += ((long)old_size - 4);
-                                writer_data.Write(reader.ReadBytes((int)size - 72 - (int)unknow_data_length - 36 - (int)old_size));
+                                writerTemp.Close();
+                                newStrLength += 4;
+                                stringBytesChanged = (long)newStrLength - (long)oldSize;
+                                writerData.Write((UInt64)newStrLength);
+                                writerData.Write(totalLines);
+                                writerData.Write(temp.ToArray());
+                                reader.BaseStream.Position += ((long)oldSize - 4);
+                                writerData.Write(reader.ReadBytes((int)size - 72 - (int)unknowDataLength - 36 - (int)oldSize));
                                 
                             }
                             else
                             {
-                                writer_data.Write(reader.ReadBytes((int)size));
+                                writerData.Write(reader.ReadBytes((int)size));
                             }
-                            writer_data.Close();
-                            new_data.Add(new_real_data.ToArray());
+                            writerData.Close();
+                            newData.Add(newRealData.ToArray());
                             reader.BaseStream.Position = start;
                             writer.Write(reader.ReadBytes(32));
-                            if (string_bytes_changed != 0)
+                            if (stringBytesChanged != 0)
                             {
-                                writer.Write((UInt32)(size + string_bytes_changed));
-                                bytes_changed += string_bytes_changed;
+                                writer.Write((UInt32)(size + stringBytesChanged));
+                                bytesChanged += stringBytesChanged;
                                 reader.BaseStream.Position += 4;
                             }
                             else
                             {
                                 writer.Write(reader.ReadBytes(4));
                             }
-                            writer.Write((UInt32)new_offset);
+                            writer.Write((UInt32)newOffset);
                             reader.BaseStream.Position += 4;
-                            writer.Write(reader.ReadBytes((int)header_length - 40));
+                            writer.Write(reader.ReadBytes((int)headerLength - 40));
                         }
                         writer.Write(new byte[ArchiveConfig.TableToData]);
-                        foreach (byte[] data_message in new_data)
+                        foreach (byte[] data_message in newData)
                         {
                             writer.Write(data_message);
                         }
                         writer.Write(new byte[4]);
                         break;
                     case 1:
-                        byte[] decompressed_data = Decompress(input, (uint)reader.BaseStream.Position);
-                        return Reimport(decompressed_data, data);
+                        byte[] decompressedData = Decompress(input, (uint)reader.BaseStream.Position);
+                        return Reimport(decompressedData, data);
                     default:
                         throw new Exception("The file has an unsupported compression type.");
                 }
