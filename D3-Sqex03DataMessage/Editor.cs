@@ -27,9 +27,8 @@ namespace D3_Sqex03DataMessage
         }
         public ViewUI TransferData(DataMessage data)
         {
-            if (_Editor.labelIndex.Text == $"{data.Index}") return _Editor;
+            if (_Editor.labelFileName.Text == $"{data.Name}") return _Editor;
             _Editor.labelFileName.Text = data.Name;
-            _Editor.labelIndex.Text = $"{data.Index}";
             _Editor.dataGridView.DataSource = null;
             _Editor.dataGridView.Rows.Clear();
             for (int i = 0; i < data.Strings.Count; i++)

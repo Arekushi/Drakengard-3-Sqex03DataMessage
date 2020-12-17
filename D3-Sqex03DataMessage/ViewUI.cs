@@ -31,7 +31,8 @@ namespace D3_Sqex03DataMessage
 
         private void dataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            int index = int.Parse(labelIndex.Text);
+            string fileName = labelFileName.Text;
+            int index = Array.FindIndex(MainUI._DataMessage.ToArray(), element => element.Name == fileName);
             if (e.RowIndex > MainUI._DataMessage[index].Strings.Count-1) return;
             MainUI._DataMessage[index].Strings[e.RowIndex] = $"{dataGridView.Rows[e.RowIndex].Cells[1].Value}";
         }

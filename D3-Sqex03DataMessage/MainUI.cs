@@ -68,7 +68,7 @@ namespace D3_Sqex03DataMessage
                                 listFiles.Items.Clear();
                                 foreach (DataMessage entry in _DataMessage)
                                 {
-                                    listFiles.Items.Add($"[{entry.Index}] - {entry.Name}");
+                                    listFiles.Items.Add(entry.Name);
                                 }
                             });
                         }

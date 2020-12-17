@@ -39,8 +39,6 @@
             this.dataGridView = new System.Windows.Forms.DataGridView();
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColText = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.labelIndexTitle = new System.Windows.Forms.Label();
-            this.labelIndex = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -124,33 +122,11 @@
             this.ColText.Name = "ColText";
             this.ColText.Width = 500;
             // 
-            // labelIndexTitle
-            // 
-            this.labelIndexTitle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelIndexTitle.AutoSize = true;
-            this.labelIndexTitle.Location = new System.Drawing.Point(508, 9);
-            this.labelIndexTitle.Name = "labelIndexTitle";
-            this.labelIndexTitle.Size = new System.Drawing.Size(36, 13);
-            this.labelIndexTitle.TabIndex = 4;
-            this.labelIndexTitle.Text = "Index:";
-            // 
-            // labelIndex
-            // 
-            this.labelIndex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelIndex.AutoSize = true;
-            this.labelIndex.Location = new System.Drawing.Point(550, 9);
-            this.labelIndex.Name = "labelIndex";
-            this.labelIndex.Size = new System.Drawing.Size(22, 13);
-            this.labelIndex.TabIndex = 5;
-            this.labelIndex.Text = "NA";
-            // 
             // ViewUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(584, 461);
-            this.Controls.Add(this.labelIndex);
-            this.Controls.Add(this.labelIndexTitle);
             this.Controls.Add(this.dataGridView);
             this.Controls.Add(this.labelFileName);
             this.Controls.Add(this.labelFileNameTitle);
@@ -171,8 +147,6 @@
         private System.Windows.Forms.Label labelFileNameTitle;
         public System.Windows.Forms.Label labelFileName;
         public System.Windows.Forms.DataGridView dataGridView;
-        private System.Windows.Forms.Label labelIndexTitle;
-        public System.Windows.Forms.Label labelIndex;
         private System.Windows.Forms.DataGridViewTextBoxColumn ID;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColText;
     }
