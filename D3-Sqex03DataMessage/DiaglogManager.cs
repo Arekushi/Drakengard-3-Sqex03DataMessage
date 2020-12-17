@@ -22,21 +22,19 @@ namespace D3_Sqex03DataMessage
             return result;
         }
 
-        public static void SaveFile(string name, byte[] data, string filter)
+        public static string SaveFile(string name, string filter)
         {
-            Thread newThread = new Thread(new ThreadStart(() =>
+            SaveFileDialog saveFile = new SaveFileDialog();
+            saveFile.FileName = name;
+            saveFile.Filter = filter;
+            if (saveFile.ShowDialog() == DialogResult.OK)
             {
-                SaveFileDialog saveFile = new SaveFileDialog();
-                saveFile.FileName = name;
-                saveFile.Filter = filter;
-                if (saveFile.ShowDialog() == DialogResult.OK)
-                {
-                    File.WriteAllBytes(saveFile.FileName, data);
-                }
-            }));
-            newThread.SetApartmentState(ApartmentState.STA);
-            newThread.Start();
-            newThread.Join();
+                return saveFile.FileName;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public static string FileBrowser(string filename, string filter)

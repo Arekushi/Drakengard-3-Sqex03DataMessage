@@ -5,6 +5,7 @@ using System.IO;
 using System.Web.Script.Serialization;
 using System.Text;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace D3_Sqex03DataMessage
 {
@@ -49,94 +50,98 @@ namespace D3_Sqex03DataMessage
             }
             return result;
         }
-        struct ExportJson
+        public static void ExportAll(string fileName, List<DataMessage> dataMessage, bool oneFile, ProgressBar progressBar)
         {
-            public bool Merge;
-            public string Archive;
-            public Dictionary<string, string> Files;
-        }
-        public static void ExportAll(string export_dir, List<DataMessage> data_message, bool merge, ProgressBar progressBar)
-        {
-            double percent = 100.0 / data_message.Count;
-            ExportJson json = new ExportJson();
-            json.Merge = merge;
-            json.Files = new Dictionary<string, string>();
-            json.Archive = merge ? "Sqex03DataMessage.txt" : null;
-            if (merge)
+            double percent = 100.0 / dataMessage.Count;
+            if (oneFile)
             {
+                string exportDir = Path.GetDirectoryName(fileName);
+                Dictionary<string, int> json = new Dictionary<string, int>();
                 List<string> content = new List<string>();
-                foreach (DataMessage data in data_message)
+                foreach (DataMessage data in dataMessage)
                 {
                     string data_strings = String.Join("\r\n", data.Strings.ToArray());
                     content.Add(data_strings);
-                    json.Files.Add($"{data.Index}", $"{data.Strings.Count}");
-                    percent += 100.0 / data_message.Count;
+                    json.Add(data.Name, data.Strings.Count);
+                    percent += 100.0 / dataMessage.Count;
                     ProgressBar(progressBar, (int)percent);
+
                 }
-                File.WriteAllText(Path.Combine(export_dir, json.Archive), String.Join("\r\n", content.ToArray()));
+                File.WriteAllText(fileName, String.Join("\r\n", content.ToArray()));
+                string jsonSerializer = new JavaScriptSerializer().Serialize(json);
+                File.WriteAllText(Path.Combine(exportDir, "export.json"), jsonSerializer);
             }
             else
             {
-                foreach (DataMessage data in data_message)
+                foreach (DataMessage data in dataMessage)
                 {
-                    string filename = $"{data.Name}.txt";
-                    string file = Path.Combine(export_dir, filename);
+                    string file = $"{data.Name}.txt";
+                    string filePath = Path.Combine(fileName, file);
                     string content = String.Join("\r\n", data.Strings.ToArray());
-                    File.WriteAllText(file, content);
-                    json.Files.Add($"{data.Index}", filename);
-                    percent += 100.0 / data_message.Count;
+                    File.WriteAllText(filePath, content);
+                    percent += 100.0 / dataMessage.Count;
                     ProgressBar(progressBar, (int)percent);
                 }
             }
-            string json_content = new JavaScriptSerializer().Serialize(json);
-            File.WriteAllText(Path.Combine(export_dir, "export.json"), json_content);
         }
 
         public static void Export(DataMessage data_message)
         {
             byte[] data = Encoding.UTF8.GetBytes(String.Join("\r\n", data_message.Strings.ToArray()));
-            DiaglogManager.SaveFile($"[{data_message.Index}] {data_message.Name}", data, "Text files (*.txt)|*.txt|All files (*.*)|*.*");
+            Thread newThread = new Thread(new ThreadStart(() =>
+            {
+                string fileName = DiaglogManager.SaveFile($"{data_message.Name}", "Text files (*.txt)|*.txt|All files (*.*)|*.*");
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    File.WriteAllBytes(fileName, data);
+                }
+            }));
+            newThread.SetApartmentState(ApartmentState.STA);
+            newThread.Start();
+            newThread.Join();
         }
 
-        public static void ImportAll(string json_file, ProgressBar progressBar)
+        public static void ImportJSON(string jsonFile, ProgressBar progressBar)
         {
-            dynamic export_config = new JavaScriptSerializer().Deserialize<dynamic>(File.ReadAllText(json_file));
-            double percent = 100.0 / export_config["Files"].Count;
-            if ((bool)export_config["Merge"] == true)
+            Dictionary<string, string> exportJson = new JavaScriptSerializer().Deserialize<dynamic>(File.ReadAllText(jsonFile));
+            double percent = 100.0 / jsonFile.Length;
+
+            string[] strings = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(jsonFile), "Sqex03DataMessage.txt"));
+            int line = 0;
+            foreach (KeyValuePair<string, string> entry in exportJson)
             {
-                string[] strings = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(json_file), export_config["Archive"]));
-                int line = 0;
-                foreach (KeyValuePair<string, object> entry in export_config["Files"])
+                DataMessage data = MainUI._DataMessage.Find(e => e.Name == entry.Key);
+                int start = line;
+                int index = 0;
+                line += int.Parse($"{entry.Value}");
+                for (int i = start; i < line; i++, index++)
                 {
-                    DataMessage data = MainUI._DataMessage.Find(e => e.Index == int.Parse(entry.Key));
-                    int start = line;
-                    int index = 0;
-                    line += int.Parse($"{entry.Value}");
-                    for (int i = start; i < line; i++, index++)
-                    {
-                        data.Strings[index] = strings[i];
-                    }
-                    percent += 100.0 / export_config["Files"].Count;
-                    ProgressBar(progressBar, (int)percent);
+                    data.Strings[index] = strings[i];
                 }
+                percent += 100.0 / jsonFile.Length;
+                ProgressBar(progressBar, (int)percent);
             }
-            else
+        }
+        public static void ImportDirectory(string dir, ProgressBar progressBar)
+        {
+            string[] files = Directory.GetFiles(dir, ".txt", SearchOption.TopDirectoryOnly);
+            double percent = 100.0 / MainUI._DataMessage.Count;
+            ProgressBar(progressBar, (int)percent);
+            foreach (DataMessage data in MainUI._DataMessage)
             {
-                foreach (KeyValuePair<string, object> entry in export_config["Files"])
+                string file = Array.Find(files, element => Path.GetFileName(element) == data.Name);
+                if (!string.IsNullOrEmpty(file))
                 {
-                    DataMessage data = MainUI._DataMessage.Find(e => e.Index == int.Parse(entry.Key));
-                    percent += 100.0 / export_config["Files"].Count;
-                    ProgressBar(progressBar, (int)percent);
-                    if (data == null || !File.Exists(Path.Combine(Path.GetDirectoryName(json_file), $"{entry.Value}"))) continue;
-                    string[] lines = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(json_file), $"{entry.Value}"));
+                    string[] strings = File.ReadAllLines(file);
                     for (int i = 0; i < data.Strings.Count; i++)
                     {
-                        data.Strings[i] = lines[i];
+                        data.Strings[i] = strings[i];
                     }
                 }
+                percent += 100.0 / MainUI._DataMessage.Count;
+                ProgressBar(progressBar, (int)percent);
             }
         }
-
         public static void Repack(string app_dir, string game_dir, List<DataMessage> data, ProgressBar progressBar)
         {
             /*string bak_dir = Path.Combine(app_dir, "Backup");

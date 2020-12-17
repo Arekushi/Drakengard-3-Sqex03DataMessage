@@ -40,11 +40,12 @@
             this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportAllToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportAllOneFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.linkLabelGit = new System.Windows.Forms.LinkLabel();
             this.linkLabelVHG = new System.Windows.Forms.LinkLabel();
-            this.exportAllOneFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importAllOneFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -121,35 +122,43 @@
             this.importToolStripMenuItem,
             this.exportAllToolStripMenuItem1,
             this.exportAllOneFileToolStripMenuItem,
-            this.importAllToolStripMenuItem});
+            this.importAllToolStripMenuItem,
+            this.importAllOneFileToolStripMenuItem});
             this.contextMenuStrip.Name = "contextMenuStrip";
-            this.contextMenuStrip.Size = new System.Drawing.Size(181, 136);
+            this.contextMenuStrip.Size = new System.Drawing.Size(182, 158);
             // 
             // exportToolStripMenuItem
             // 
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.exportToolStripMenuItem.Text = "Export";
             this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
             // 
             // importToolStripMenuItem
             // 
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.importToolStripMenuItem.Text = "Import";
             this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
             // 
             // exportAllToolStripMenuItem1
             // 
             this.exportAllToolStripMenuItem1.Name = "exportAllToolStripMenuItem1";
-            this.exportAllToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.exportAllToolStripMenuItem1.Size = new System.Drawing.Size(181, 22);
             this.exportAllToolStripMenuItem1.Text = "Export All";
             this.exportAllToolStripMenuItem1.Click += new System.EventHandler(this.exportAllStripMenuItem_Click);
+            // 
+            // exportAllOneFileToolStripMenuItem
+            // 
+            this.exportAllOneFileToolStripMenuItem.Name = "exportAllOneFileToolStripMenuItem";
+            this.exportAllOneFileToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.exportAllOneFileToolStripMenuItem.Text = "Export All (One File)";
+            this.exportAllOneFileToolStripMenuItem.Click += new System.EventHandler(this.exportAllOneFileToolStripMenuItem_Click);
             // 
             // importAllToolStripMenuItem
             // 
             this.importAllToolStripMenuItem.Name = "importAllToolStripMenuItem";
-            this.importAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.importAllToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.importAllToolStripMenuItem.Text = "Import All";
             this.importAllToolStripMenuItem.Click += new System.EventHandler(this.importAllToolStripMenuItem_Click);
             // 
@@ -186,12 +195,12 @@
             this.linkLabelVHG.Text = "VietHoaGame";
             this.linkLabelVHG.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelVHG_LinkClicked);
             // 
-            // exportAllOneFileToolStripMenuItem
+            // importAllOneFileToolStripMenuItem
             // 
-            this.exportAllOneFileToolStripMenuItem.Name = "exportAllOneFileToolStripMenuItem";
-            this.exportAllOneFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.exportAllOneFileToolStripMenuItem.Text = "Export All (One File)";
-            this.exportAllOneFileToolStripMenuItem.Click += new System.EventHandler(this.exportAllOneFileToolStripMenuItem_Click);
+            this.importAllOneFileToolStripMenuItem.Name = "importAllOneFileToolStripMenuItem";
+            this.importAllOneFileToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.importAllOneFileToolStripMenuItem.Text = "Import All (One File)";
+            this.importAllOneFileToolStripMenuItem.Click += new System.EventHandler(this.importAllOneFileToolStripMenuItem_Click);
             // 
             // MainUI
             // 
@@ -234,6 +243,7 @@
         private System.Windows.Forms.LinkLabel linkLabelGit;
         private System.Windows.Forms.LinkLabel linkLabelVHG;
         private System.Windows.Forms.ToolStripMenuItem exportAllOneFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importAllOneFileToolStripMenuItem;
     }
 }
 

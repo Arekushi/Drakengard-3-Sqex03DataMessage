@@ -7,8 +7,8 @@ namespace D3_Sqex03DataMessage
     {
         public static readonly string TOCName = "PS3TOC.TXT";
         public static readonly string[] ArchiveName = new string[] { "ALLMESSAGE_SF.XXX", "MISSIONMESSAGE_SF.XXX" };
-        public static readonly UInt32 Signature = 0x9E2A83C1;
-        public static readonly UInt32 UncompressedFlags = 0x80880009;
+        public static readonly uint Signature = 0x9E2A83C1;
+        public static readonly uint UncompressedFlags = 0x80880009;
         public static readonly byte[] UncompressedFlagsBytes = new byte[] { 0x80, 0x88, 0x00, 0x09 };
         public static readonly long CompressionTypeOffset = 109;
         public static readonly long PackageFlagsOffset = 21;

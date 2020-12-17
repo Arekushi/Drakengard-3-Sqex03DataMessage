@@ -174,16 +174,16 @@ namespace D3_Sqex03DataMessage
         {
             if (_DataMessage.Count() <= 0 || _IsBusy || listFiles.SelectedIndex <= -1) return;
             int index = listFiles.SelectedIndex;
-            string file_name = $"[${_DataMessage[index].Index}] {_DataMessage[index].Name}";
-            string file_import = DiaglogManager.FileBrowser(file_name, "Text files (*.txt)|*.txt|All files (*.*)|*.*");
-            if (string.IsNullOrEmpty(file_import)) return;
+            string fileName = _DataMessage[index].Name;
+            string fileImport = DiaglogManager.FileBrowser(fileName, "Text files (*.txt)|*.txt|All files (*.*)|*.*");
+            if (string.IsNullOrEmpty(fileImport)) return;
             _IsBusy = true;
             Task.Run(() =>
             {
                 try
                 {
                     double percent = 100.0 / _DataMessage[index].Strings.Count;
-                    string[] lines = File.ReadAllLines(file_import);
+                    string[] lines = File.ReadAllLines(fileImport);
                     for (int i = 0; i < _DataMessage[index].Strings.Count; i++)
                     {
                         _DataMessage[index].Strings[i] = lines[i];
@@ -204,17 +204,17 @@ namespace D3_Sqex03DataMessage
             Extract(false);
             
         }
-        private void Extract(bool merge)
+        private void Extract(bool oneFile)
         {
             if (_DataMessage.Count() <= 0 || _IsBusy) return;
-            string export_dir = DiaglogManager.FolderBrowser("Export (Directory)");
-            if (string.IsNullOrEmpty(export_dir)) return;
+            string fileName = DiaglogManager.SaveFile("Sqex03DataMessage.txt", "Text files (*.txt)|*.txt|All files (*.*)|*.*");
+            if (string.IsNullOrEmpty(fileName)) return;
             _IsBusy = true;
             Task.Run(() =>
             {
                 try
                 {
-                    Operation.ExportAll(export_dir, _DataMessage, merge, this.progressBar);
+                    Operation.ExportAll(fileName, _DataMessage, oneFile, this.progressBar);
                 }
                 catch (Exception err)
                 {
@@ -227,14 +227,14 @@ namespace D3_Sqex03DataMessage
         private void importAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (_DataMessage.Count() <= 0 || _IsBusy ) return;
-            string json_file = DiaglogManager.FileBrowser("export.json", "JSON files (*.json)|*.json");
-            if (string.IsNullOrEmpty(json_file)) return;
+            string dir = DiaglogManager.FolderBrowser("Export");
+            if (string.IsNullOrEmpty(dir)) return;
             _IsBusy = true;
             Task.Run(() =>
             {
                 try
                 {
-                    Operation.ImportAll(json_file, this.progressBar);
+                    Operation.ImportDirectory(dir, this.progressBar);
                 }
                 catch (Exception err)
                 {
@@ -256,6 +256,26 @@ namespace D3_Sqex03DataMessage
         private void exportAllOneFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Extract(true);
+        }
+
+        private void importAllOneFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_DataMessage.Count() <= 0 || _IsBusy) return;
+            string jsonFile = DiaglogManager.FileBrowser("export.json", "JSON files (*.json)|*.json");
+            if (string.IsNullOrEmpty(jsonFile)) return;
+            _IsBusy = true;
+            Task.Run(() =>
+            {
+                try
+                {
+                    Operation.ImportJSON(jsonFile, this.progressBar);
+                }
+                catch (Exception err)
+                {
+                    _IsBusy = false;
+                    MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
+                }
+            }).GetAwaiter().OnCompleted(() => { _IsBusy = false; });
         }
     }
 }
