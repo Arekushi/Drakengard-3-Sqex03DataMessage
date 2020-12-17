@@ -117,41 +117,57 @@ namespace D3_Sqex03DataMessage
                             if (reader.ReadUInt32() > 0) reader.BaseStream.Position += 4;
                             reader.BaseStream.Position += 20;
                             current = reader.BaseStream.Position;
-                            if (indexType == 2) //Sqex03DataMessage
+                            if (nameImport[indexType] == "Sqex03DataMessage")
                             {
                                 reader.BaseStream.Position = offset;
                                 uint order = reader.ReadUInt32();
-                                string nameID = nameTable[reader.ReadInt32()];
-
-                                if (nameID.ToLower() == "none") continue;
-                                reader.BaseStream.Position += 64;
-                                ulong unknowDataLength = reader.ReadUInt64();
-                                reader.BaseStream.Position += (long)unknowDataLength + 16 + 8;
-                                List<string> strings = new List<string>();
-                                ulong totalLines = reader.ReadUInt64();
-                                for (int line = 0; line < (long)totalLines; line++)
+                                while (true)
                                 {
-                                    int strLength = reader.ReadInt32();
-                                    if (strLength != 0)
+                                    string nameID = nameTable[reader.ReadInt32()];
+                                    if (nameID == "None") break;
+                                    string classID = nameTable[reader.ReadInt64()];
+                                    if (classID == "IntProperty")
                                     {
-                                        int zeroBytes = 1;
-                                        if (strLength < 0)
+                                        long lengthProperty = reader.ReadInt64();
+                                        long intProperty = reader.ReadInt64();
+                                    }
+                                    else if (classID == "ArrayProperty")
+                                    {
+                                        long lengthProperty = reader.ReadInt64();
+                                        if (nameID == "m_String")
                                         {
-                                            strLength = (int)((strLength ^ 0xFFFFFFFF) * 2);
-                                            zeroBytes = 2;
-                                        }
+                                            List<string> strings = new List<string>();
+                                            long strCount = reader.ReadInt64();
+                                            for (int line = 0; line < strCount; line++)
+                                            {
+                                                int strLength = reader.ReadInt32();
+                                                if (strLength != 0)
+                                                {
+                                                    int zeroBytes = 1;
+                                                    if (strLength < 0)
+                                                    {
+                                                        strLength = (int)((strLength ^ 0xFFFFFFFF) * 2);
+                                                        zeroBytes = 2;
+                                                    }
 
-                                        string str = zeroBytes < 2 ? Encoding.GetEncoding(1252).GetString(reader.ReadBytes((int)strLength - zeroBytes)) : Encoding.Unicode.GetString(reader.ReadBytes((int)strLength));
-                                        for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
-                                        {
-                                            str = str.Replace(ArchiveConfig.OriginalChars[k], ArchiveConfig.ReplaceChars[k]);
+                                                    string str = zeroBytes < 2 ? Encoding.GetEncoding(1252).GetString(reader.ReadBytes((int)strLength - zeroBytes)) : Encoding.Unicode.GetString(reader.ReadBytes((int)strLength));
+                                                    for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
+                                                    {
+                                                        str = str.Replace(ArchiveConfig.OriginalChars[k], ArchiveConfig.ReplaceChars[k]);
+                                                    }
+                                                    strings.Add(str);
+                                                    reader.BaseStream.Position += zeroBytes;
+                                                }
+                                            }
+                                            DataMessage dataMessage = new DataMessage(name, (int)order, strings);
+                                            result.Add(dataMessage);
                                         }
-                                        strings.Add(str);
-                                        reader.BaseStream.Position += zeroBytes;
+                                        else
+                                        {
+                                            reader.BaseStream.Position += lengthProperty + 4;
+                                        }
                                     }
                                 }
-                                DataMessage dataMessage = new DataMessage(name, (int)order, strings);
-                                result.Add(dataMessage);
                             }
                         }
                         break;
@@ -182,11 +198,6 @@ namespace D3_Sqex03DataMessage
             return result;
         }
 
-        /*public static void ReImport (byte[] input, string file, ArchiveConfig config)
-        {
-            
-        }*/
-
         private static byte[] Reimport (byte[] input, Dictionary<UInt32, List<string>> data)
         {
             MemoryStream result = new MemoryStream();
@@ -209,6 +220,24 @@ namespace D3_Sqex03DataMessage
                         UInt32 exportOffset = reader.ReadUInt32();
                         UInt32 importCount = reader.ReadUInt32();
                         UInt32 importOffset = reader.ReadUInt32();
+
+                        string[] nameTable = new string[nameCount];
+                        reader.BaseStream.Position = nameOffset;
+                        for (int i = 0; i < nameCount; i++)
+                        {
+                            uint strLength = reader.ReadUInt32();
+                            nameTable[i] = Encoding.UTF8.GetString(reader.ReadBytes((int)strLength - 1));
+                            reader.BaseStream.Position += 9;
+                        }
+                        string[] nameImport = new string[importCount];
+                        reader.BaseStream.Position = importOffset;
+                        for (int i = 0; i < importCount; i++)
+                        {
+                            reader.BaseStream.Position += 20;
+                            uint index = reader.ReadUInt32();
+                            nameImport[i] = nameTable[(int)index];
+                            reader.BaseStream.Position += 4;
+                        }
 
                         reader.BaseStream.Position = 0;
                         writer.Write(reader.ReadBytes((int)exportOffset)); //header
@@ -239,7 +268,7 @@ namespace D3_Sqex03DataMessage
                             List<string> strings;
                             long stringBytesChanged = 0;
                             
-                            if (indexType == 2 && data.TryGetValue(order, out strings))
+                            if (nameImport[indexType] == "Sqex03DataMessage" && data.TryGetValue(order, out strings))
                             {
                                 writerData.Write(reader.ReadBytes(72));
                                 UInt64 unknowDataLength = reader.ReadUInt64();
