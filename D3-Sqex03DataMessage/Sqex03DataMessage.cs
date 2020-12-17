@@ -107,8 +107,10 @@ namespace D3_Sqex03DataMessage
                             uint indexType = (uint)reader.ReadInt32() ^ 0xFFFFFFFF;
                             reader.BaseStream.Position += 8;
                             UInt32 nameIndex = reader.ReadUInt32();
+                            UInt32 suffixName = reader.ReadUInt32();
                             string name = nameTable[(int)nameIndex];
-                            reader.BaseStream.Position += 16;
+                            if (suffixName != 0) name += $"_{suffixName}"; 
+                            reader.BaseStream.Position += 12;
                             UInt32 size = reader.ReadUInt32();
                             UInt32 offset = reader.ReadUInt32();
                             reader.BaseStream.Position += 4;
@@ -118,31 +120,35 @@ namespace D3_Sqex03DataMessage
                             if (indexType == 2) //Sqex03DataMessage
                             {
                                 reader.BaseStream.Position = offset;
-                                UInt32 order = reader.ReadUInt32();
-                                if (ArchiveConfig.Skip.Contains(order)) continue;
-                                reader.BaseStream.Position += 68;
-                                UInt64 unknowDataLength = reader.ReadUInt64();
+                                uint order = reader.ReadUInt32();
+                                string nameID = nameTable[reader.ReadInt32()];
+
+                                if (nameID.ToLower() == "none") continue;
+                                reader.BaseStream.Position += 64;
+                                ulong unknowDataLength = reader.ReadUInt64();
                                 reader.BaseStream.Position += (long)unknowDataLength + 16 + 8;
                                 List<string> strings = new List<string>();
-                                UInt64 totalLines = reader.ReadUInt64();
+                                ulong totalLines = reader.ReadUInt64();
                                 for (int line = 0; line < (long)totalLines; line++)
                                 {
-                                    long strLength = reader.ReadInt32();
-                                    
-                                    int zeroBytes = 1;
-                                    if (strLength < 0)
+                                    int strLength = reader.ReadInt32();
+                                    if (strLength != 0)
                                     {
-                                        strLength = (strLength^0xFFFFFFFF)*2;
-                                        zeroBytes = 2;
+                                        int zeroBytes = 1;
+                                        if (strLength < 0)
+                                        {
+                                            strLength = (int)((strLength ^ 0xFFFFFFFF) * 2);
+                                            zeroBytes = 2;
+                                        }
+
+                                        string str = zeroBytes < 2 ? Encoding.GetEncoding(1252).GetString(reader.ReadBytes((int)strLength - zeroBytes)) : Encoding.Unicode.GetString(reader.ReadBytes((int)strLength));
+                                        for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
+                                        {
+                                            str = str.Replace(ArchiveConfig.OriginalChars[k], ArchiveConfig.ReplaceChars[k]);
+                                        }
+                                        strings.Add(str);
+                                        reader.BaseStream.Position += zeroBytes;
                                     }
-                                    
-                                    string str = zeroBytes < 2 ? Encoding.GetEncoding(1252).GetString(reader.ReadBytes((int)strLength - zeroBytes)) : Encoding.Unicode.GetString(reader.ReadBytes((int)strLength));
-                                    for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
-                                    {
-                                        str = str.Replace(ArchiveConfig.OriginalChars[k], ArchiveConfig.ReplaceChars[k]);
-                                    }
-                                    strings.Add(str);
-                                    reader.BaseStream.Position += zeroBytes;
                                 }
                                 DataMessage dataMessage = new DataMessage(name, (int)order, strings);
                                 result.Add(dataMessage);
@@ -233,38 +239,53 @@ namespace D3_Sqex03DataMessage
                             List<string> strings;
                             long stringBytesChanged = 0;
                             
-                            if (indexType == 2 && !ArchiveConfig.Skip.Contains(order) && data.TryGetValue(order, out strings))
+                            if (indexType == 2 && data.TryGetValue(order, out strings))
                             {
                                 writerData.Write(reader.ReadBytes(72));
                                 UInt64 unknowDataLength = reader.ReadUInt64();
                                 writerData.Write(unknowDataLength);
                                 writerData.Write(reader.ReadBytes((int)unknowDataLength + 16));
                                 UInt64 oldSize = reader.ReadUInt64();
-                                UInt64 totalLines = reader.ReadUInt64();
+                                UInt64 strCount = reader.ReadUInt64();
                                 int newStrLength = 0;
                                 MemoryStream temp = new MemoryStream();
                                 BeBinaryWriter writerTemp = new BeBinaryWriter(temp);
-                                for (int line = 0; line < (long)totalLines; line++)
+                                int newStrIndex = 0;
+                                for (int y = 0; y < (long)strCount; y++)
                                 {
-                                    string lineStr = strings[line];
-                                    for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
+                                    int oldStrLength = reader.ReadInt32();
+                                    if (oldStrLength != 0)
                                     {
-                                        lineStr = lineStr.Replace(ArchiveConfig.ReplaceChars[k], ArchiveConfig.OriginalChars[k]);
+                                        newStrIndex++;
+                                        string lineStr = strings[newStrIndex];
+                                        for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
+                                        {
+                                            lineStr = lineStr.Replace(ArchiveConfig.ReplaceChars[k], ArchiveConfig.OriginalChars[k]);
+                                        }
+                                        long strLength = lineStr.Length ^ 0xFFFFFFFF;
+                                        writerTemp.Write((Int32)strLength);
+                                        byte[] str = Encoding.Unicode.GetBytes(lineStr);
+                                        writerTemp.Write(str);
+                                        writerTemp.Write(new byte[2]);
+                                        newStrLength += 4 + str.Length + 2;
+                                        if (oldStrLength < 0)
+                                        {
+                                            oldStrLength = Math.Abs(oldStrLength) * 2;
+                                        }
+                                        reader.BaseStream.Position += oldStrLength;
                                     }
-                                    long strLength = lineStr.Length ^ 0xFFFFFFFF;
-                                    writerTemp.Write((Int32)strLength);
-                                    byte[] str = Encoding.Unicode.GetBytes(lineStr);
-                                    writerTemp.Write(str);
-                                    writerTemp.Write(new byte[2]);
-                                    newStrLength += 4 + str.Length + 2;
+                                    else
+                                    {
+                                        writerTemp.Write(new byte[4]);
+                                    }
                                 }
                                 writerTemp.Close();
                                 newStrLength += 4;
                                 stringBytesChanged = (long)newStrLength - (long)oldSize;
                                 writerData.Write((UInt64)newStrLength);
-                                writerData.Write(totalLines);
+                                writerData.Write(strCount);
                                 writerData.Write(temp.ToArray());
-                                reader.BaseStream.Position += ((long)oldSize - 4);
+                                //reader.BaseStream.Position += ((long)oldSize - 4);
                                 writerData.Write(reader.ReadBytes((int)size - 72 - (int)unknowDataLength - 36 - (int)oldSize));
                                 
                             }

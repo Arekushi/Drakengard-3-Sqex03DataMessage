@@ -14,7 +14,6 @@ namespace D3_Sqex03DataMessage
         public static readonly long PackageFlagsOffset = 21;
         public static readonly long TableOffset = 25;
         public static readonly long TableToData = 456;
-        public static readonly UInt32[] Skip = new UInt32[] { 7, 43, 54 };
         public static readonly string[] OriginalChars = new string[]
         {
             '\u0001'.ToString(), '\u0003'.ToString(), '\u0004'.ToString(), '\u0005'.ToString(),

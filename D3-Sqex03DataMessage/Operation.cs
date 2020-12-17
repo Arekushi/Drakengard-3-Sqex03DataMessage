@@ -79,7 +79,7 @@ namespace D3_Sqex03DataMessage
             {
                 foreach (DataMessage data in data_message)
                 {
-                    string filename = $"[{data.Index}] {data.Name}.txt";
+                    string filename = $"{data.Name}.txt";
                     string file = Path.Combine(export_dir, filename);
                     string content = String.Join("\r\n", data.Strings.ToArray());
                     File.WriteAllText(file, content);
