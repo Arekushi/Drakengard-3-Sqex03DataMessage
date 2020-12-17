@@ -77,7 +77,7 @@ namespace D3_Sqex03DataMessage
                     {
                         _IsBusy = false;
                         _DataMessage.Clear();
-                        MessageBox.Show($"An error occurred:\n\n{err}", _MessageBoxTitle);
+                        MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
                     }
                 }).GetAwaiter().OnCompleted(() => { _IsBusy = false; });
             } 
