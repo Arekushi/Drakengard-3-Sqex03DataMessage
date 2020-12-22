@@ -26,7 +26,9 @@ namespace D3_Sqex03DataMessage
         private void View_Resize(object sender, EventArgs e)
         {
             int width = dataGridView.Width;
-            dataGridView.Columns[1].Width = width - 60;
+            //dataGridView.Columns[0].Width = (int)(width * 0.25);
+            //dataGridView.Columns[1].Width = (int)(width * 0.75);
+            dataGridView.Columns[1].Width = width - 170;
         }
 
         private void dataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)

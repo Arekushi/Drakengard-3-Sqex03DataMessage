@@ -60,7 +60,6 @@ namespace D3_Sqex03DataMessage
             reader.Close();
             return result.ToArray();
         }
-
         public static List<DataMessage> Decrypt(byte[] input)
         {
             List<DataMessage> result = new List<DataMessage>();
@@ -121,6 +120,7 @@ namespace D3_Sqex03DataMessage
                             {
                                 reader.BaseStream.Position = offset;
                                 uint order = reader.ReadUInt32();
+                                List<Speaker> speakers = new List<Speaker>();
                                 while (true)
                                 {
                                     string nameID = nameTable[reader.ReadInt32()];
@@ -136,19 +136,40 @@ namespace D3_Sqex03DataMessage
                                         long lengthProperty = reader.ReadInt64();
                                         if (nameID == "m_String")
                                         {
-                                            DataMessage dataMessage = GetStrings(ref reader, name);
+                                            DataMessage dataMessage = GetStrings(ref reader, name, false);
                                             result.Add(dataMessage);
                                         }
                                         else if (nameID == "m_Name")
                                         {
-                                            DataMessage dataMessage = GetStrings(ref reader, $"{name}_Name");
+                                            DataMessage dataMessage = GetStrings(ref reader, $"{name}_Name", true);
                                             if (!string.IsNullOrWhiteSpace(string.Join("", dataMessage.Strings))) result.Add(dataMessage);
+                                        }
+                                        else if (nameID == "m_MesData")
+                                        {
+                                            GetSpeakers(ref reader, ref speakers, nameTable);
                                         }
                                         else
                                         {
                                             reader.BaseStream.Position += lengthProperty + 4;
                                         }
                                     }
+                                }
+                                if (result.Any(entry => entry.Name == $"{name}_Name"))
+                                {
+                                    DataMessage data = result.Find(entry => entry.Name == name);
+                                    DataMessage dataName = result.Find(entry => entry.Name == $"{name}_Name");
+                                    for (int y = 0; y < speakers.Count; y++)
+                                    {
+                                        try
+                                        {
+                                            speakers[y].Name = dataName.Strings[speakers[y].ID];
+                                        }
+                                        catch
+                                        {
+                                            speakers[y].Name = dataName.Strings[y];
+                                        }
+                                    }
+                                    data.Speakers = speakers;
                                 }
                             }
                         }
@@ -167,8 +188,53 @@ namespace D3_Sqex03DataMessage
             reader.Close();
             return result;
         }
-
-        private static DataMessage GetStrings(ref BinaryReaderBE reader, string name)
+        private static void GetSpeakers(ref BinaryReaderBE reader, ref List<Speaker> speakers, string[] nameTable)
+        {
+            long strCount = reader.ReadInt64();
+            for (int i = 0; i < strCount; i++)
+            {
+                Speaker speaker = new Speaker();
+                while (true)
+                {
+                    string nameID = nameTable[reader.ReadInt32()];
+                    string classID = nameTable[reader.ReadInt64()];
+                    if (nameID == "m_iStrData")
+                    {
+                        long lengthProperty = reader.ReadInt64();
+                        long subArrayCount = reader.ReadInt64();
+                        reader.BaseStream.Position += lengthProperty + 4;
+                        break;
+                    }
+                    else if (nameID == "m_iName")
+                    {
+                        long lengthProperty = reader.ReadInt64();
+                        speaker.ID = (int)reader.ReadInt64();
+                    }
+                    else if (nameID == "m_iIndex")
+                    {
+                        long lengthProperty = reader.ReadInt64();
+                        speaker.StrIndex = (int)reader.ReadInt64();
+                    }
+                    else
+                    {
+                        if (classID == "IntProperty")
+                        {
+                            long lengthProperty = reader.ReadInt64();
+                            long intProperty = reader.ReadInt64();
+                        }
+                        else if (classID == "ByteProperty")
+                        {
+                            long lengthProperty = reader.ReadInt64();
+                            string nameBytesProperty = nameTable[reader.ReadInt64()];
+                            reader.ReadByte();
+                            uint padding = reader.ReadUInt32();
+                        }
+                    }
+                }
+                speakers.Add(speaker);
+            }
+        }
+        private static DataMessage GetStrings(ref BinaryReaderBE reader, string name, bool isSpeakerName)
         {
             List<string> strings = new List<string>();
             long strCount = reader.ReadInt64();
@@ -186,7 +252,7 @@ namespace D3_Sqex03DataMessage
                     reader.BaseStream.Position += zeroBytes;
                 }
             }
-            DataMessage dataMessage = new DataMessage(name, strings);
+            DataMessage dataMessage = new DataMessage(name, strings, isSpeakerName);
             return dataMessage;
         }
 

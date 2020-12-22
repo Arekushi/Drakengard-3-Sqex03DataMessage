@@ -7,10 +7,13 @@ namespace D3_Sqex03DataMessage
     {
         public string Name { get; set; }
         public List<string> Strings { get; set; }
-        public DataMessage (string name, List<string> strings)
+        public bool IsSpeakerName { get; set; }
+        public List<Speaker> Speakers { get; set; }
+        public DataMessage (string name, List<string> strings, bool isSpeakerName)
         {
             Name = name;
             Strings = strings;
+            IsSpeakerName = isSpeakerName;
         }
     }
 }

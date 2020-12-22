@@ -37,7 +37,7 @@
             this.labelFileNameTitle = new System.Windows.Forms.Label();
             this.labelFileName = new System.Windows.Forms.Label();
             this.dataGridView = new System.Windows.Forms.DataGridView();
-            this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Title = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColText = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
@@ -81,7 +81,7 @@
             this.dataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ID,
+            this.Title,
             this.ColText});
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
@@ -109,18 +109,18 @@
             this.dataGridView.TabIndex = 3;
             this.dataGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellEndEdit);
             // 
-            // ID
+            // Title
             // 
-            this.ID.HeaderText = "ID";
-            this.ID.Name = "ID";
-            this.ID.ReadOnly = true;
-            this.ID.Width = 40;
+            this.Title.HeaderText = "ID / Title / Speaker";
+            this.Title.Name = "Title";
+            this.Title.ReadOnly = true;
+            this.Title.Width = 150;
             // 
             // ColText
             // 
             this.ColText.HeaderText = "Text";
             this.ColText.Name = "ColText";
-            this.ColText.Width = 500;
+            this.ColText.Width = 390;
             // 
             // ViewUI
             // 
@@ -147,7 +147,7 @@
         private System.Windows.Forms.Label labelFileNameTitle;
         public System.Windows.Forms.Label labelFileName;
         public System.Windows.Forms.DataGridView dataGridView;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Title;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColText;
     }
 }
