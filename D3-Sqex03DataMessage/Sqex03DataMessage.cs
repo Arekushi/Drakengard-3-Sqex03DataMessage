@@ -166,7 +166,7 @@ namespace D3_Sqex03DataMessage
                                         }
                                         catch
                                         {
-                                            speakers[y].Name = dataName.Strings[y];
+                                            speakers[y].Name = "";
                                         }
                                     }
                                     data.Speakers = speakers;
@@ -251,6 +251,10 @@ namespace D3_Sqex03DataMessage
                     strings.Add(str);
                     reader.BaseStream.Position += zeroBytes;
                 }
+                else
+                {
+                    strings.Add("{null}");
+                }
             }
             DataMessage dataMessage = new DataMessage(name, strings, isSpeakerName);
             return dataMessage;
@@ -271,7 +275,6 @@ namespace D3_Sqex03DataMessage
         {
             long strCount = reader.ReadInt64();
             long newStrLength = 0;
-            int newStrIndex = 0;
             MemoryStream temp = new MemoryStream();
             BeBinaryWriter tempWriter = new BeBinaryWriter(temp);
             tempWriter.Write(strCount);
@@ -280,8 +283,7 @@ namespace D3_Sqex03DataMessage
                 int oldStrLength = reader.ReadInt32();
                 if (oldStrLength != 0)
                 {
-                    string lineStr = strings[newStrIndex];
-                    newStrIndex++;
+                    string lineStr = strings[i];
                     for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
                     {
                         lineStr = lineStr.Replace(ArchiveConfig.ReplaceChars[k], ArchiveConfig.OriginalChars[k]);
@@ -447,7 +449,6 @@ namespace D3_Sqex03DataMessage
                             {
                                 writerData.Write(reader.ReadBytes((int)size));
                             }
-                            //writerData.Write(new byte[4]);
                             writerData.Close();
                             newData.Add(newRealData.ToArray());
                             reader.BaseStream.Position = start;
