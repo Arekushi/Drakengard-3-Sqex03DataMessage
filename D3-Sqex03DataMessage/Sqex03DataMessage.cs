@@ -213,7 +213,8 @@ namespace D3_Sqex03DataMessage
                     else if (nameID == "m_iIndex")
                     {
                         long lengthProperty = reader.ReadInt64();
-                        speaker.StrIndex = (int)reader.ReadInt64();
+                        reader.ReadInt64();
+                        //speaker.StrIndex = (int)reader.ReadInt64();
                     }
                     else
                     {
