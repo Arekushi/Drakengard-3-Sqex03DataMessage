@@ -33,7 +33,7 @@ namespace D3_Sqex03DataMessage
             _Editor.dataGridView.Rows.Clear();
             for (int i = 0; i < data.Strings.Count; i++)
             {
-                string title = data.Speakers == null ? $"{i}" : data.Speakers.Find(entry => entry.StrIndex == i).Name;
+                string title = data.Speakers == null ? $"{i}" : data.Speakers[i].Name;
                 _Editor.dataGridView.Rows.Add(title, data.Strings[i]);
             }
             return _Editor;

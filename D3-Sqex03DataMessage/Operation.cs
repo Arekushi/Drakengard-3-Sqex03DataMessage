@@ -36,13 +36,13 @@ namespace D3_Sqex03DataMessage
             }
         }
 
-        public static List<DataMessage> Decrypt(string app_dir, string game_dir)
+        public static List<DataMessage> Decrypt(string appDir, string gameDir)
         {
             
             List<DataMessage> result = new List<DataMessage>();
             /*string bak_dir = Path.Combine(app_dir, "Backup");
             Backup(game_dir, bak_dir);*/
-            string archive = Directory.GetFiles(game_dir, "*.XXX", SearchOption.AllDirectories)
+            string archive = Directory.GetFiles(gameDir, "*.XXX", SearchOption.AllDirectories)
                     .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).FirstOrDefault();
             if (!string.IsNullOrEmpty(archive))
             {
