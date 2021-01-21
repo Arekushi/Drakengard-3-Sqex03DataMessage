@@ -469,9 +469,9 @@ namespace D3_Sqex03DataMessage
                             writer.Write(reader.ReadBytes((int)headerLength - 40));
                         }
                         writer.Write(new byte[ArchiveConfig.TableToData]);
-                        foreach (byte[] data_message in newData)
+                        foreach (byte[] dataMessage in newData)
                         {
-                            writer.Write(data_message);
+                            writer.Write(dataMessage);
                         }
                         writer.Write(new byte[4]);
                         break;
