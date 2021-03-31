@@ -19,29 +19,11 @@ namespace D3_Sqex03DataMessage
             });
 
         }
-        public static void Backup(string source, string dest)
-        {
-            if (!Directory.Exists(dest))
-            {
-                Directory.CreateDirectory(dest);
-                List<string> files = Directory.GetFiles(source, "*.*", SearchOption.AllDirectories)
-                    .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file)) || ArchiveConfig.TOCName == Path.GetFileName(file)).ToList();
-                if (files.Count > 0)
-                {
-                    foreach (string file in files)
-                    {
-                        File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), true);
-                    }
-                }
-            }
-        }
 
         public static List<DataMessage> Decrypt(string appDir, string gameDir)
         {
             
             List<DataMessage> result = new List<DataMessage>();
-            /*string bak_dir = Path.Combine(app_dir, "Backup");
-            Backup(game_dir, bak_dir);*/
             string archive = Directory.GetFiles(gameDir, "*.XXX", SearchOption.AllDirectories)
                     .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).FirstOrDefault();
             if (!string.IsNullOrEmpty(archive))
@@ -144,35 +126,42 @@ namespace D3_Sqex03DataMessage
         }
         public static void Repack(string app_dir, string game_dir, List<DataMessage> data, ProgressBar progressBar)
         {
-            /*string bak_dir = Path.Combine(app_dir, "Backup");
-            Backup(game_dir, bak_dir);*/
             List<string> archives = Directory.GetFiles(game_dir, "*.XXX", SearchOption.AllDirectories)
                     .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).ToList();
-            string toc = Directory.GetFiles(game_dir, "*.txt", SearchOption.AllDirectories)
-                    .Where(file => ArchiveConfig.TOCName == Path.GetFileName(file)).FirstOrDefault();
+            List<string> tocs = Directory.GetFiles(game_dir, "*.txt", SearchOption.AllDirectories)
+                    .Where(file => ArchiveConfig.TOCName.Contains(Path.GetFileName(file))).ToList();
             if (archives.Count < 0) return;
             double percent = 0;
-            string[] toc_lines = string.IsNullOrEmpty(toc) ? null : File.ReadAllLines(toc);
+            Dictionary<string, string[]> tocContent = new Dictionary<string, string[]>();
+            foreach (string toc in tocs)
+            {
+                tocContent.Add(Path.GetFileName(toc), File.ReadAllLines(toc));
+            }
             foreach (string archive in archives)
             {
                 byte[] bytes = Sqex03DataMessage.ReImport(data, archive);
                 File.WriteAllBytes(archive, bytes);
-                if (toc_lines != null)
+                foreach (KeyValuePair<string, string[]> entry in tocContent)
                 {
-                    for (int i = 0; i < toc_lines.Length; i++)
+                    for (int i = 0; i < entry.Value.Length; i++)
                     {
-                        string[] entry = toc_lines[i].Split((char)32);
-                        if (entry[2].Split((char)92).LastOrDefault().ToLower() == Path.GetFileName(archive).ToLower())
+                        string[] col = entry.Value[i].Split((char)32);
+                        if (col.Length > 2 && col[2].Split((char)92).LastOrDefault().ToLower() == Path.GetFileName(archive).ToLower())
                         {
-                            entry[0] = $"{bytes.Length}";
-                            toc_lines[i] = String.Join(" ", entry);
+                            col[0] = $"{bytes.Length}";
+                            entry.Value[i] = String.Join(" ", col);
                         }
                     }
                 }
                 percent += 100.0 / archives.Count;
                 ProgressBar(progressBar, (int)percent);
             }
-            if (!string.IsNullOrEmpty(toc)) File.WriteAllLines(toc, toc_lines);
+            foreach (string toc in tocs)
+            {
+                string[] content;
+                if (tocContent.TryGetValue(Path.GetFileName(toc), out content)) 
+                    File.WriteAllLines(toc, content);
+            }
         }
     }
 }

@@ -103,7 +103,7 @@ namespace D3_Sqex03DataMessage
                     catch (Exception err)
                     {
                         _IsBusy = false;
-                        MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
+                        MessageBox.Show($"An error occurred:\n\n{err}", _MessageBoxTitle);
                     }
                 }).GetAwaiter().OnCompleted(() => { _IsBusy = false; });
             }
