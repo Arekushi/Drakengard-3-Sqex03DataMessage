@@ -77,7 +77,7 @@ namespace D3_Sqex03DataMessage
                     {
                         _IsBusy = false;
                         _DataMessage.Clear();
-                        MessageBox.Show($"An error occurred:\n\n{err}", _MessageBoxTitle);
+                        MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
                     }
                 }).GetAwaiter().OnCompleted(() => { _IsBusy = false; });
             } 
@@ -111,7 +111,7 @@ namespace D3_Sqex03DataMessage
 
         private void btnSelectGameLocation_Click(object sender, EventArgs e)
         {
-            string folderPath = DiaglogManager.FolderBrowser("BLUS31197");
+            string folderPath = DiaglogManager.FolderBrowser("Drakengard 3");
             if (!string.IsNullOrEmpty(folderPath))
             {
                 txtBoxGameLocation.Text = folderPath;
@@ -186,6 +186,7 @@ namespace D3_Sqex03DataMessage
                     string[] lines = File.ReadAllLines(fileImport);
                     for (int i = 0; i < _DataMessage[index].Strings.Count; i++)
                     {
+                        if (lines[i].Contains("{#Name=")) lines[i] = lines[i].Split(new string[] { "{#Name=" }, StringSplitOptions.None).First();
                         _DataMessage[index].Strings[i] = lines[i];
                         percent += 100.0 / _DataMessage[index].Strings.Count;
                         Operation.ProgressBar(this.progressBar, (int)percent);
@@ -201,20 +202,15 @@ namespace D3_Sqex03DataMessage
 
         private void exportAllStripMenuItem_Click(object sender, EventArgs e)
         {
-            Extract(false);
-            
-        }
-        private void Extract(bool oneFile)
-        {
             if (_DataMessage.Count() <= 0 || _IsBusy) return;
-            string fileName = DiaglogManager.SaveFile("Sqex03DataMessage.txt", "Text files (*.txt)|*.txt|All files (*.*)|*.*");
-            if (string.IsNullOrEmpty(fileName)) return;
+            string folderName = DiaglogManager.FolderBrowser("Export");
+            if (string.IsNullOrEmpty(folderName)) return;
             _IsBusy = true;
             Task.Run(() =>
             {
                 try
                 {
-                    Operation.ExportAll(fileName, _DataMessage, oneFile, this.progressBar);
+                    Operation.ExportAllDirectory(folderName, _DataMessage, this.progressBar);
                 }
                 catch (Exception err)
                 {
@@ -222,6 +218,7 @@ namespace D3_Sqex03DataMessage
                     MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
                 }
             }).GetAwaiter().OnCompleted(() => { _IsBusy = false; });
+
         }
 
         private void importAllToolStripMenuItem_Click(object sender, EventArgs e)
@@ -255,7 +252,22 @@ namespace D3_Sqex03DataMessage
 
         private void exportAllOneFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Extract(true);
+            if (_DataMessage.Count() <= 0 || _IsBusy) return;
+            string fileName = DiaglogManager.SaveFile("Sqex03DataMessage.txt", "Text files (*.txt)|*.txt|All files (*.*)|*.*");
+            if (string.IsNullOrEmpty(fileName)) return;
+            _IsBusy = true;
+            Task.Run(() =>
+            {
+                try
+                {
+                    Operation.ExportAll(fileName, _DataMessage, this.progressBar);
+                }
+                catch (Exception err)
+                {
+                    _IsBusy = false;
+                    MessageBox.Show($"An error occurred:\n\n{err.Message}", _MessageBoxTitle);
+                }
+            }).GetAwaiter().OnCompleted(() => { _IsBusy = false; });
         }
 
         private void importAllOneFileToolStripMenuItem_Click(object sender, EventArgs e)

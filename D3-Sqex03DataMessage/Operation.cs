@@ -39,47 +39,80 @@ namespace D3_Sqex03DataMessage
             }
             return result;
         }
-        public static void ExportAll(string fileName, List<DataMessage> dataMessage, bool oneFile, ProgressBar progressBar)
+        public static void ExportAll(string fileName, List<DataMessage> dataMessage, ProgressBar progressBar)
         {
             double percent = 100.0 / dataMessage.Count;
-            if (oneFile)
+            string exportDir = Path.GetDirectoryName(fileName);
+            Dictionary<string, int> json = new Dictionary<string, int>();
+            List<string> content = new List<string>();
+            foreach (DataMessage data in dataMessage)
             {
-                string exportDir = Path.GetDirectoryName(fileName);
-                Dictionary<string, int> json = new Dictionary<string, int>();
-                List<string> content = new List<string>();
-                foreach (DataMessage data in dataMessage)
+                List<string> messages = new List<string>();
+                if (data.Speakers == null)
                 {
-                    string data_strings = String.Join("\r\n", data.Strings.ToArray());
-                    content.Add(data_strings);
-                    json.Add(data.Name, data.Strings.Count);
-                    percent += 100.0 / dataMessage.Count;
-                    ProgressBar(progressBar, (int)percent);
-
+                    messages = data.Strings;
                 }
-                File.WriteAllText(fileName, String.Join("\r\n", content.ToArray()));
-                string jsonSerializer = new JavaScriptSerializer().Serialize(json);
-                File.WriteAllText(Path.Combine(exportDir, "export.json"), jsonSerializer);
+                else
+                {
+                    for (int i = 0; i < data.Strings.Count; i++)
+                    {
+                        messages.Add($"{data.Strings[i]}{(char)123}#Name={(char)34}{data.Speakers[i].Name}{(char)34}{(char)125}");
+                    }
+                }
+                string dataStrings = String.Join("\r\n", messages.ToArray());
+                content.Add(dataStrings);
+                json.Add(data.Name, data.Strings.Count);
+                percent += 100.0 / dataMessage.Count;
+                ProgressBar(progressBar, (int)percent);
+
+            }
+            File.WriteAllText(fileName, String.Join("\r\n", content.ToArray()));
+            string jsonSerializer = new JavaScriptSerializer().Serialize(json);
+            File.WriteAllText(Path.Combine(exportDir, "export.json"), jsonSerializer);
+        }
+        public static void ExportAllDirectory(string folderName, List<DataMessage> dataMessage, ProgressBar progressBar)
+        {
+            double percent = 100.0 / dataMessage.Count;
+            foreach (DataMessage data in dataMessage)
+            {
+                string file = $"{data.Name}.txt";
+                string filePath = Path.Combine(folderName, file);
+                List<string> messages = new List<string>();
+                if (data.Speakers == null)
+                {
+                    messages = data.Strings;
+                }
+                else
+                {
+                    for (int i = 0; i < data.Strings.Count; i++)
+                    {
+                        messages.Add($"{data.Strings[i]}{(char)123}#Name={(char)34}{data.Speakers[i].Name}{(char)34}{(char)125}");
+                    }
+                }
+                string content = String.Join("\r\n", messages.ToArray());
+                File.WriteAllText(filePath, content);
+                percent += 100.0 / dataMessage.Count;
+                ProgressBar(progressBar, (int)percent);
+            }
+        }
+        public static void Export(DataMessage dataMessage)
+        {
+            List<string> messages = new List<string>();
+            if (dataMessage.Speakers == null)
+            {
+                messages = dataMessage.Strings;
             }
             else
             {
-                foreach (DataMessage data in dataMessage)
+                for (int i = 0; i < dataMessage.Strings.Count; i++)
                 {
-                    string file = $"{data.Name}.txt";
-                    string filePath = Path.Combine(fileName, file);
-                    string content = String.Join("\r\n", data.Strings.ToArray());
-                    File.WriteAllText(filePath, content);
-                    percent += 100.0 / dataMessage.Count;
-                    ProgressBar(progressBar, (int)percent);
+                    messages.Add($"{dataMessage.Strings[i]}{(char)123}#Name={(char)34}{dataMessage.Speakers[i].Name}{(char)34}{(char)125}");
                 }
             }
-        }
-
-        public static void Export(DataMessage data_message)
-        {
-            byte[] data = Encoding.UTF8.GetBytes(String.Join("\r\n", data_message.Strings.ToArray()));
+            byte[] data = Encoding.UTF8.GetBytes(String.Join("\r\n", messages.ToArray()));
             Thread newThread = new Thread(new ThreadStart(() =>
             {
-                string fileName = DiaglogManager.SaveFile($"{data_message.Name}", "Text files (*.txt)|*.txt|All files (*.*)|*.*");
+                string fileName = DiaglogManager.SaveFile($"{dataMessage.Name}", "Text files (*.txt)|*.txt|All files (*.*)|*.*");
                 if (!string.IsNullOrEmpty(fileName))
                 {
                     File.WriteAllBytes(fileName, data);
@@ -92,7 +125,7 @@ namespace D3_Sqex03DataMessage
 
         public static void ImportJSON(string jsonFile, ProgressBar progressBar)
         {
-            Dictionary<string, string> exportJson = new JavaScriptSerializer().Deserialize<dynamic>(File.ReadAllText(jsonFile));
+            Dictionary<string, string> exportJson = new JavaScriptSerializer().Deserialize<Dictionary<string, string>>(File.ReadAllText(jsonFile));
             double percent = 100.0 / jsonFile.Length;
 
             string[] strings = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(jsonFile), "Sqex03DataMessage.txt"));
@@ -105,6 +138,7 @@ namespace D3_Sqex03DataMessage
                 line += int.Parse($"{entry.Value}");
                 for (int i = start; i < line; i++, index++)
                 {
+                    if (strings[i].Contains("{#Name=")) strings[i] = strings[i].Split(new string[] { "{#Name=" }, StringSplitOptions.None).First();
                     data.Strings[index] = strings[i];
                 }
                 percent += 100.0 / jsonFile.Length;
@@ -124,6 +158,7 @@ namespace D3_Sqex03DataMessage
                     string[] strings = File.ReadAllLines(file);
                     for (int i = 0; i < data.Strings.Count; i++)
                     {
+                        if (strings[i].Contains("{#Name=")) strings[i] = strings[i].Split(new string[] { "{#Name=" }, StringSplitOptions.None).First();
                         data.Strings[i] = strings[i];
                     }
                 }
