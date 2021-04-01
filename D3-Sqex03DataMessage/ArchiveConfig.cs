@@ -6,7 +6,11 @@ namespace D3_Sqex03DataMessage
     public static class ArchiveConfig
     {
         public static readonly string[] TOCName = new string[] { "PS3TOC.TXT", "PS3TOCPATCH.TXT" };
-        public static readonly string[] ArchiveName = new string[] { "ALLMESSAGE_SF.XXX", "MISSIONMESSAGE_SF.XXX" };
+        public static readonly string[] ArchiveName = new string[] {
+            "ALLMESSAGE_SF.XXX", "MISSIONMESSAGE_SF.XXX",
+            "MISSIONMESSAGE_D_00_SF.XXX", "MISSIONMESSAGE_D_10_SF.XXX", "MISSIONMESSAGE_D_20_SF.XXX",
+            "MISSIONMESSAGE_D_30_SF.XXX", "MISSIONMESSAGE_D_40_SF.XXX", "MISSIONMESSAGE_D_50_SF.XXX"
+        };
         public static readonly uint Signature = 0x9E2A83C1;
         public static readonly uint UncompressedFlags = 0x80880009;
         public static readonly byte[] UncompressedFlagsBytes = new byte[] { 0x80, 0x88, 0x00, 0x09 };

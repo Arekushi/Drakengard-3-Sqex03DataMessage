@@ -331,7 +331,9 @@ namespace D3_Sqex03DataMessage
                         uint exportOffset = reader.ReadUInt32();
                         uint importCount = reader.ReadUInt32();
                         uint importOffset = reader.ReadUInt32();
-
+                        uint emptyOffset = reader.ReadUInt32();
+                        uint unknownOffset = reader.ReadUInt32();
+                        long emptyBytes = unknownOffset - emptyOffset;
                         string[] nameTable = new string[nameCount];
                         reader.BaseStream.Position = nameOffset;
                         for (int i = 0; i < nameCount; i++)
@@ -468,7 +470,7 @@ namespace D3_Sqex03DataMessage
                             reader.BaseStream.Position += 4;
                             writer.Write(reader.ReadBytes((int)headerLength - 40));
                         }
-                        writer.Write(new byte[ArchiveConfig.TableToData]);
+                        writer.Write(new byte[emptyBytes]);
                         foreach (byte[] dataMessage in newData)
                         {
                             writer.Write(dataMessage);

@@ -24,11 +24,18 @@ namespace D3_Sqex03DataMessage
         {
             
             List<DataMessage> result = new List<DataMessage>();
-            string archive = Directory.GetFiles(gameDir, "*.XXX", SearchOption.AllDirectories)
-                    .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).FirstOrDefault();
-            if (!string.IsNullOrEmpty(archive))
+            string[] archives = Directory.GetFiles(gameDir, "*.XXX", SearchOption.AllDirectories)
+                    .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).ToArray();
+            if (archives.Length > 0)
             {
-                result = Sqex03DataMessage.Decrypt(File.ReadAllBytes(archive));
+                foreach(string archive in archives)
+                {
+                    List<DataMessage> messages = Sqex03DataMessage.Decrypt(File.ReadAllBytes(archive));
+                    foreach(DataMessage message in messages)
+                    {
+                        if (!result.Any(item => item.Name == message.Name)) result.Add(message);
+                    }
+                }
             }
             return result;
         }
