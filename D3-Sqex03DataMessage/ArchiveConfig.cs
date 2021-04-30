@@ -7,9 +7,21 @@ namespace D3_Sqex03DataMessage
     {
         public static readonly string[] TOCName = new string[] { "PS3TOC.TXT", "PS3TOCPATCH.TXT" };
         public static readonly string[] ArchiveName = new string[] {
-            "ALLMESSAGE_SF.XXX", "MISSIONMESSAGE_SF.XXX",
+            "ALLMESSAGE_SF.XXX", "MISSIONMESSAGE_SF.XXX", "BG00_CHC_10_EVENT.XXX", "BG00_CHC_20_EVENT.XXX",
+            "BG10_SEA_10_2_EVENT.XXX", "BG10_SEA_10_3_EVENT.XXX", "BG10_SEA_10_4_EVENT.XXX", "BG10_SEA_10_C_EVENT.XXX",
+            "BG10_SEA_10_EVENT.XXX", "BG10_SEA_20_2_EVENT.XXX", "BG10_SEA_20_3_EVENT.XXX", "BG10_SEA_20_4_EVENT.XXX",
+            "BG10_SEA_20_C_EVENT.XXX", "BG10_SEA_20_EVENT.XXX", "BG10_SEA_30_1_EVENT.XXX", "BG10_SEA_30_EVENT.XXX",
+            "BG10_SEA_40_5_EVENT.XXX", "BG10_SEA_40_6_EVENT.XXX", "BG10_SEA_40_7_EVENT.XXX", "BG10_SEA_40_8_EVENT.XXX",
+            "BG10_SEA_40_EVENT.XXX", "BG13_SEA_10_C_EVENT.XXX", "BG13_SEA_10_EVENT.XXX", "BG14_SEA_10_C_EVENT.XXX",
+            "BG14_SEA_10_C_EVENT0.XXX", "BG14_SEA_10_EVENT.XXX", "BG20_60_LD02_EVENT.XXX", "BG20_60_LD04_EVENT.XXX",
+            "BG20_60_LD08_EVENT.XXX", "BG20_MNT_10_C_EVENT.XXX", "BG20_MNT_10_EVENT.XXX", "BG20_MNT_20_2_EVENT.XXX",
+            "BG20_MNT_20_3_EVENT.XXX", "BG20_MNT_20_4_EVENT.XXX", "BG20_MNT_20_C_EVENT.XXX", "BG20_MNT_20_EVENT.XXX",
+            "BG20_MNT_40_1_EVENT.XXX", "BG20_MNT_40_C_EVENT.XXX", "BG20_MNT_40_EVENT.XXX", "BG20_MNT_50_2_EVENT.XXX",
+            "BG20_MNT_50_3_EVENT.XXX", "BG20_MNT_50_4_EVENT.XXX",
+
+
             "MISSIONMESSAGE_D_00_SF.XXX", "MISSIONMESSAGE_D_10_SF.XXX", "MISSIONMESSAGE_D_20_SF.XXX",
-            "MISSIONMESSAGE_D_30_SF.XXX", "MISSIONMESSAGE_D_40_SF.XXX", "MISSIONMESSAGE_D_50_SF.XXX"
+            "MISSIONMESSAGE_D_30_SF.XXX", "MISSIONMESSAGE_D_50_SF.XXX", /*"MISSIONMESSAGE_D_40_SF.XXX"*/
         };
         public static readonly uint Signature = 0x9E2A83C1;
         public static readonly uint UncompressedFlags = 0x80880009;
@@ -17,7 +29,6 @@ namespace D3_Sqex03DataMessage
         public static readonly long CompressionTypeOffset = 109;
         public static readonly long PackageFlagsOffset = 21;
         public static readonly long TableOffset = 25;
-        public static readonly long TableToData = 456;
         public static readonly string[] OriginalChars = new string[]
         {
             '\u0001'.ToString(), '\u0003'.ToString(), '\u0004'.ToString(), '\u0005'.ToString(),
