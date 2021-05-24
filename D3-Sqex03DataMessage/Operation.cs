@@ -20,23 +20,28 @@ namespace D3_Sqex03DataMessage
 
         }
 
-        public static List<DataMessage> Decrypt(string appDir, string gameDir)
+        public static List<DataMessage> Decrypt(string appDir, string gameDir, ProgressBar progressBar)
         {
             
             List<DataMessage> result = new List<DataMessage>();
+            double percent = 0;
+            ProgressBar(progressBar, (int)percent);
             string[] archives = Directory.GetFiles(gameDir, "*.XXX", SearchOption.AllDirectories)
                     .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).ToArray();
             if (archives.Length > 0)
             {
-                foreach(string archive in archives)
+                foreach (string archive in archives)
                 {
                     List<DataMessage> messages = Sqex03DataMessage.Decrypt(File.ReadAllBytes(archive));
                     foreach(DataMessage message in messages)
                     {
                         if (!result.Any(item => item.Name == message.Name)) result.Add(message);
                     }
+                    percent += 100.0 / archives.Length;
+                    ProgressBar(progressBar, (int)percent);
                 }
             }
+            ProgressBar(progressBar, 100);
             return result;
         }
         public static void ExportAll(string fileName, List<DataMessage> dataMessage, ProgressBar progressBar)
@@ -69,6 +74,7 @@ namespace D3_Sqex03DataMessage
             File.WriteAllText(fileName, String.Join("\r\n", content.ToArray()));
             string jsonSerializer = new JavaScriptSerializer().Serialize(json);
             File.WriteAllText(Path.Combine(exportDir, "export.json"), jsonSerializer);
+            ProgressBar(progressBar, 100);
         }
         public static void ExportAllDirectory(string folderName, List<DataMessage> dataMessage, ProgressBar progressBar)
         {
@@ -94,6 +100,7 @@ namespace D3_Sqex03DataMessage
                 percent += 100.0 / dataMessage.Count;
                 ProgressBar(progressBar, (int)percent);
             }
+            ProgressBar(progressBar, 100);
         }
         public static void Export(DataMessage dataMessage)
         {
@@ -144,6 +151,7 @@ namespace D3_Sqex03DataMessage
                 percent += 100.0 / jsonFile.Length;
                 ProgressBar(progressBar, (int)percent);
             }
+            ProgressBar(progressBar, 100);
         }
         public static void ImportDirectory(string dir, ProgressBar progressBar)
         {
@@ -165,6 +173,7 @@ namespace D3_Sqex03DataMessage
                 percent += 100.0 / MainUI._DataMessage.Count;
                 ProgressBar(progressBar, (int)percent);
             }
+            ProgressBar(progressBar, 100);
         }
         public static void Repack(string app_dir, string game_dir, List<DataMessage> data, ProgressBar progressBar)
         {
@@ -204,6 +213,7 @@ namespace D3_Sqex03DataMessage
                 if (tocContent.TryGetValue(Path.GetFileName(toc), out content)) 
                     File.WriteAllLines(toc, content);
             }
+            ProgressBar(progressBar, 100);
         }
     }
 }

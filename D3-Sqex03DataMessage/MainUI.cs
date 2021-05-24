@@ -59,7 +59,7 @@ namespace D3_Sqex03DataMessage
                 {
                     try
                     {
-                        List<DataMessage> data = Operation.Decrypt(_AppDirectory, _JsonConfig["GameLocation"]);
+                        List<DataMessage> data = Operation.Decrypt(_AppDirectory, _JsonConfig["GameLocation"], this.progressBar);
                         if (data.Count > 0)
                         {
                             _DataMessage = data;
