@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Be.IO;
-using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 
 namespace D3_Sqex03DataMessage
@@ -214,7 +213,6 @@ namespace D3_Sqex03DataMessage
                     {
                         long lengthProperty = reader.ReadInt64();
                         reader.ReadInt64();
-                        //speaker.StrIndex = (int)reader.ReadInt64();
                     }
                     else
                     {
@@ -275,7 +273,6 @@ namespace D3_Sqex03DataMessage
         private static byte[] WriteStrings(ref BinaryReaderBE reader, List<string> strings)
         {
             long strCount = reader.ReadInt64();
-            long newStrLength = 0;
             MemoryStream temp = new MemoryStream();
             BeBinaryWriter tempWriter = new BeBinaryWriter(temp);
             tempWriter.Write(strCount);
@@ -284,17 +281,16 @@ namespace D3_Sqex03DataMessage
                 int oldStrLength = reader.ReadInt32();
                 if (oldStrLength != 0)
                 {
-                    string lineStr = strings[i];
-                    for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
+                    string str = strings[i];
+                    for (int j = 0; j < ArchiveConfig.OriginalChars.Length; j++)
                     {
-                        lineStr = lineStr.Replace(ArchiveConfig.ReplaceChars[k], ArchiveConfig.OriginalChars[k]);
+                        str = str.Replace(ArchiveConfig.ReplaceChars[j], ArchiveConfig.OriginalChars[j]);
                     }
-                    long strLength = lineStr.Length ^ 0xFFFFFFFF;
-                    tempWriter.Write((Int32)strLength);
-                    byte[] str = Encoding.Unicode.GetBytes(lineStr);
-                    tempWriter.Write(str);
+                    long strLength = str.Length ^ 0xFFFFFFFF;
+                    tempWriter.Write((int)strLength);
+                    byte[] strBytes = Encoding.Unicode.GetBytes(str);
+                    tempWriter.Write(strBytes);
                     tempWriter.Write(new byte[2]);
-                    newStrLength += 4 + str.Length + 2;
                     if (oldStrLength < 0)
                     {
                         oldStrLength = Math.Abs(oldStrLength) * 2;
@@ -308,6 +304,64 @@ namespace D3_Sqex03DataMessage
             }
             tempWriter.Close();
             return temp.ToArray();
+        }
+        private static byte[] WriteMesData(ref BinaryReaderBE reader, List<string> strings, string[] nameTable)
+        {
+            long strCount = reader.ReadInt64();
+            MemoryStream ms = new MemoryStream();
+            BeBinaryWriter bw = new BeBinaryWriter(ms);
+            bw.Write(strCount);
+            for (int i = 0; i < strCount; i++)
+            {
+                while (true)
+                {
+                    var nameIndex = reader.ReadInt32();
+                    var classIndex = reader.ReadInt64();
+                    string nameID = nameTable[nameIndex];
+                    string classID = nameTable[classIndex];
+                    bw.Write(nameIndex);
+                    bw.Write(classIndex);
+                    if (nameID == "m_iStrData")
+                    {
+                        long lengthProperty = reader.ReadInt64();
+                        reader.BaseStream.Position += lengthProperty;
+                        string str = strings[i];
+                        for (int j = 0; j < ArchiveConfig.OriginalChars.Length; j++)
+                        {
+                            str = str.Replace(ArchiveConfig.ReplaceChars[j], ArchiveConfig.OriginalChars[j]);
+                        }
+                        byte[] strBytes = Encoding.GetEncoding("utf-32BE").GetBytes(str);
+                        bw.Write((long)(strBytes.Length + 8));
+                        bw.Write((long)(str.Length) + 1);
+                        bw.Write(strBytes);
+
+                        bw.Write(reader.ReadBytes(12));
+                        break;
+                    }
+                    else
+                    {
+                        if (classID == "IntProperty")
+                        {
+                            long lengthProperty = reader.ReadInt64();
+                            long intProperty = reader.ReadInt64();
+                            bw.Write(lengthProperty);
+                            bw.Write(intProperty);
+                        }
+                        else if (classID == "ByteProperty")
+                        {
+                            long lengthProperty = reader.ReadInt64();
+                            long nameProperty = reader.ReadInt64();
+                            bw.Write(lengthProperty);
+                            bw.Write(nameProperty);
+                            bw.Write(reader.ReadByte());
+                            uint padding = reader.ReadUInt32();
+                            bw.Write(padding);
+                        }
+                    }
+                }
+            }
+            bw.Close();
+            return ms.ToArray();
         }
         private static byte[] Reimport (byte[] input, Dictionary<string, List<string>> data)
         {
@@ -438,6 +492,23 @@ namespace D3_Sqex03DataMessage
                                             {
                                                 writerData.Write(lengthProperty);
                                                 writerData.Write(reader.ReadBytes((int)lengthProperty + 4));
+                                            }
+                                        }
+                                        else if (nameID == "m_MesData")
+                                        {
+                                            List<string> strings;
+                                            if (data.TryGetValue(name, out strings))
+                                            {
+                                                byte[] temp = WriteMesData(ref reader, strings, nameTable);
+                                                long newMesDataLength = temp.Length - 4;
+                                                writerData.Write(newMesDataLength);
+                                                writerData.Write(temp);
+                                                stringBytesChanged += newMesDataLength - lengthProperty;
+                                            }
+                                            else
+                                            {
+                                                writerData.Write(lengthProperty);
+                                                writerData.Write(reader.ReadBytes((int)(lengthProperty + 4)));
                                             }
                                         }
                                         else
