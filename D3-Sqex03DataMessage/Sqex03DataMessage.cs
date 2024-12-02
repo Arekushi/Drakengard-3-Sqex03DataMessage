@@ -245,8 +245,12 @@ namespace D3_Sqex03DataMessage
                     int zeroBytes = strLength < 0 ? 2 : 1;
                     strLength = strLength < 0 ? (int)((strLength ^ 0xFFFFFFFF) * 2) : strLength;
                     string str = zeroBytes < 2 ? Encoding.GetEncoding(1252).GetString(reader.ReadBytes((int)strLength - zeroBytes)) : Encoding.Unicode.GetString(reader.ReadBytes((int)strLength));
-                    for (int k = 0; k < ArchiveConfig.OriginalChars.Length; k++)
-                        str = str.Replace(ArchiveConfig.OriginalChars[k], ArchiveConfig.ReplaceChars[k]);
+                    for (int j = 0; j < ArchiveConfig.GameCodeDict.Count; j++)
+                    {
+                        string key = ArchiveConfig.GameCodeDict.ElementAt(j).Key;
+                        string value = ArchiveConfig.GameCodeDict.ElementAt(j).Value;
+                        str = str.Replace(key, value);
+                    }
                     strings.Add(str);
                     reader.BaseStream.Position += zeroBytes;
                 }
@@ -282,9 +286,11 @@ namespace D3_Sqex03DataMessage
                 if (oldStrLength != 0)
                 {
                     string str = strings[i];
-                    for (int j = 0; j < ArchiveConfig.OriginalChars.Length; j++)
+                    for (int j = 0; j < ArchiveConfig.GameCodeDict.Count; j++)
                     {
-                        str = str.Replace(ArchiveConfig.ReplaceChars[j], ArchiveConfig.OriginalChars[j]);
+                        string key = ArchiveConfig.GameCodeDict.ElementAt(j).Key;
+                        string value = ArchiveConfig.GameCodeDict.ElementAt(j).Value;
+                        str = str.Replace(value, key);
                     }
                     long strLength = str.Length ^ 0xFFFFFFFF;
                     tempWriter.Write((int)strLength);
@@ -326,9 +332,11 @@ namespace D3_Sqex03DataMessage
                         long lengthProperty = reader.ReadInt64();
                         reader.BaseStream.Position += lengthProperty;
                         string str = strings[i];
-                        for (int j = 0; j < ArchiveConfig.OriginalChars.Length; j++)
+                        for (int j = 0; j < ArchiveConfig.GameCodeDict.Count; j++)
                         {
-                            str = str.Replace(ArchiveConfig.ReplaceChars[j], ArchiveConfig.OriginalChars[j]);
+                            string key = ArchiveConfig.GameCodeDict.ElementAt(j).Key;
+                            string value = ArchiveConfig.GameCodeDict.ElementAt(j).Value;
+                            str = str.Replace(value, key);
                         }
                         byte[] strBytes = Encoding.GetEncoding("utf-32BE").GetBytes(str);
                         bw.Write((long)(strBytes.Length + 8));

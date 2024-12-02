@@ -57,17 +57,24 @@ namespace D3_Sqex03DataMessage
         public static readonly long CompressionTypeOffset = 109;
         public static readonly long PackageFlagsOffset = 21;
         public static readonly long TableOffset = 25;
-        public static readonly string[] OriginalChars = new string[]
+        public static readonly Dictionary<string, string> GameCodeDict = new Dictionary<string, string>()
         {
-            '\u0001'.ToString(), '\u0003'.ToString(), '\u0004'.ToString(), '\u0005'.ToString(),
-            '\u0006'.ToString(), '\u0008'.ToString(), '\u0009'.ToString(), '\u0010'.ToString(),
-            '\u000a'.ToString(), '\u000b'.ToString(), '\u000c'.ToString(), '\u000d'.ToString(),
-            '\u000f'.ToString(), '\u25b2'.ToString(), '\u25bc'.ToString()
-        };
-        public static readonly string[] ReplaceChars = new string[]
-        {
-            "{01}", "{03}", "{04}", "{LF}", "{06}", "{08}", "{09}", "{10}", "{0A}", "{0B}", "{0C}",
-            "{0D}", "{0F}", "{25B2}", "{25BC}"
+            { '\u0001'.ToString(), "{01}" },
+            { '\u0002'.ToString(), "{02}" },
+            { '\u0003'.ToString(), "{03}" },
+            { '\u0004'.ToString(), "{04}" },
+            { '\u0005'.ToString(), "{LF}" },
+            { '\u0006'.ToString(), "{06}" },
+            { '\u0008'.ToString(), "{08}" },
+            { '\u0009'.ToString(), "{09}" },
+            { '\u0010'.ToString(), "{10}" },
+            { '\u000a'.ToString(), "{0A}" },
+            { '\u000b'.ToString(), "{0B}" },
+            { '\u000c'.ToString(), "{0C}" },
+            { '\u000d'.ToString(), "{0D}" },
+            { '\u000f'.ToString(), "{0F}" },
+            { '\u25b2'.ToString(), "{25B2}" },
+            { '\u25BC'.ToString(), "{25BC}" },
         };
     }
 }
