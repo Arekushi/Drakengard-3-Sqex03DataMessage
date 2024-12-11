@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
 using System.Drawing;
 
 namespace D3_Sqex03DataMessage
@@ -27,7 +22,6 @@ namespace D3_Sqex03DataMessage
         }
         public ViewUI TransferData(DataMessage data)
         {
-            if (_Editor.labelFileName.Text == $"{data.Name}") return _Editor;
             _Editor.labelFileName.Text = data.Name;
             _Editor.dataGridView.DataSource = null;
             _Editor.dataGridView.Rows.Clear();

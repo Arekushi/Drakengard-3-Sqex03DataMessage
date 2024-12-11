@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Be.IO;
-using System.Windows.Forms;
 
 namespace D3_Sqex03DataMessage
 {
