@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using D3_Sqex03DataMessage.CLI;
+using System;
 
 namespace D3_Sqex03DataMessage
 {
@@ -12,11 +9,10 @@ namespace D3_Sqex03DataMessage
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainUI());
+            CommandLineHandler commandLineHandler = new CommandLineHandler();
+            commandLineHandler.Execute(args);
         }
     }
 }

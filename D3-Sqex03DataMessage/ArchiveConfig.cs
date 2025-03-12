@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace D3_Sqex03DataMessage
 {
@@ -56,12 +55,14 @@ namespace D3_Sqex03DataMessage
             "ADDWEAPONCLOTHE6_INFO_SF.XXX", "ADDWEAPONCLOTHE7_INFO_SF.XXX", "ADDWEAPONCLOTHE8_INFO_SF.XXX",
             "ADDWEAPONCLOTHE9_INFO_SF.XXX"
         };
+
         public static readonly uint Signature = 0x9E2A83C1;
         public static readonly uint UncompressedFlags = 0x80880009;
         public static readonly byte[] UncompressedFlagsBytes = new byte[] { 0x80, 0x88, 0x00, 0x09 };
         public static readonly long CompressionTypeOffset = 109;
         public static readonly long PackageFlagsOffset = 21;
         public static readonly long TableOffset = 25;
+
         public static readonly Dictionary<string, string> GameCodeDict = new Dictionary<string, string>()
         {
             { '\u0001'.ToString(), "{01}" },

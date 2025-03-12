@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Be.IO;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.IO;
-using Be.IO;
 
 namespace D3_Sqex03DataMessage
 {
@@ -58,6 +58,7 @@ namespace D3_Sqex03DataMessage
             reader.Close();
             return result.ToArray();
         }
+
         public static List<DataMessage> Decrypt(byte[] input)
         {
             List<DataMessage> result = new List<DataMessage>();
@@ -106,7 +107,7 @@ namespace D3_Sqex03DataMessage
                             uint nameIndex = reader.ReadUInt32();
                             uint suffixName = reader.ReadUInt32();
                             string name = nameTable[(int)nameIndex];
-                            if (suffixName != 0) name += $"_{suffixName}"; 
+                            if (suffixName != 0) name += $"_{suffixName}";
                             reader.BaseStream.Position += 12;
                             uint size = reader.ReadUInt32();
                             uint offset = reader.ReadUInt32();
@@ -186,6 +187,7 @@ namespace D3_Sqex03DataMessage
             reader.Close();
             return result;
         }
+
         private static void GetSpeakers(ref BinaryReaderBE reader, ref List<Speaker> speakers, string[] nameTable)
         {
             long strCount = reader.ReadInt64();
@@ -232,6 +234,7 @@ namespace D3_Sqex03DataMessage
                 speakers.Add(speaker);
             }
         }
+
         private static DataMessage GetStrings(ref BinaryReaderBE reader, string name, bool isSpeakerName)
         {
             List<string> strings = new List<string>();
@@ -243,7 +246,7 @@ namespace D3_Sqex03DataMessage
                 {
                     int zeroBytes = strLength < 0 ? 2 : 1;
                     strLength = strLength < 0 ? (int)((strLength ^ 0xFFFFFFFF) * 2) : strLength;
-                    string str = zeroBytes < 2 ? Encoding.GetEncoding(1252).GetString(reader.ReadBytes((int)strLength - zeroBytes)) : Encoding.Unicode.GetString(reader.ReadBytes((int)strLength));
+                    string str = zeroBytes < 2 ? Encoding.Latin1.GetString(reader.ReadBytes((int)strLength - zeroBytes)) : Encoding.Unicode.GetString(reader.ReadBytes((int)strLength));
                     for (int j = 0; j < ArchiveConfig.GameCodeDict.Count; j++)
                     {
                         string key = ArchiveConfig.GameCodeDict.ElementAt(j).Key;
@@ -273,6 +276,7 @@ namespace D3_Sqex03DataMessage
             byte[] result = Reimport(originalFile, strings);
             return result;
         }
+
         private static byte[] WriteStrings(ref BinaryReaderBE reader, List<string> strings)
         {
             long strCount = reader.ReadInt64();
@@ -310,6 +314,7 @@ namespace D3_Sqex03DataMessage
             tempWriter.Close();
             return temp.ToArray();
         }
+
         private static byte[] WriteMesData(ref BinaryReaderBE reader, List<string> strings, string[] nameTable)
         {
             long strCount = reader.ReadInt64();
@@ -370,7 +375,8 @@ namespace D3_Sqex03DataMessage
             bw.Close();
             return ms.ToArray();
         }
-        private static byte[] Reimport (byte[] input, Dictionary<string, List<string>> data)
+
+        private static byte[] Reimport(byte[] input, Dictionary<string, List<string>> data)
         {
             MemoryStream result = new MemoryStream();
             MemoryStream inputStream = new MemoryStream(input);
@@ -415,7 +421,7 @@ namespace D3_Sqex03DataMessage
 
                         reader.BaseStream.Position = 0;
                         writer.Write(reader.ReadBytes((int)exportOffset)); //header
-                        
+
                         long bytesChanged = 0;
                         List<byte[]> newData = new List<byte[]>();
                         long current = exportOffset;
@@ -433,7 +439,7 @@ namespace D3_Sqex03DataMessage
                             if (suffixName != 0) name += $"_{suffixName}";
                             reader.BaseStream.Position += 12;
                             uint size = reader.ReadUInt32();
-                            uint offset = reader.ReadUInt32();                            
+                            uint offset = reader.ReadUInt32();
                             long newOffset = offset + bytesChanged;
                             reader.BaseStream.Position += 4;
                             if (reader.ReadUInt32() > 0) reader.BaseStream.Position += 4;
@@ -482,7 +488,7 @@ namespace D3_Sqex03DataMessage
                                             {
                                                 writerData.Write(lengthProperty);
                                                 writerData.Write(reader.ReadBytes((int)lengthProperty + 4));
-                                            }    
+                                            }
                                         }
                                         else if (nameID == "m_Name")
                                         {
@@ -566,6 +572,7 @@ namespace D3_Sqex03DataMessage
             {
                 throw new Exception("The file is not a Drakengard 3 (Unreal 3) file.");
             }
+
             reader.Close();
             writer.Close();
             return result.ToArray();
