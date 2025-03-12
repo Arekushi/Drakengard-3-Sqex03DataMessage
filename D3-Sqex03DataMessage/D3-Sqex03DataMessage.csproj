@@ -11,6 +11,11 @@
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
 		<OutputType>Exe</OutputType>
+		<PublishSingleFile>true</PublishSingleFile>
+		<PublishTrimmed>true</PublishTrimmed>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<SelfContained>true</SelfContained>
+		<PublishTrimmed>false</PublishTrimmed>
 		<RootNamespace>D3_Sqex03DataMessage</RootNamespace>
 		<AssemblyName>D3 Sqex03DataMessage</AssemblyName>
 		<ApplicationIcon>Drakengard3.ico</ApplicationIcon>
