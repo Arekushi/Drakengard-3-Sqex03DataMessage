@@ -60,6 +60,8 @@ namespace D3_Sqex03DataMessage
 
         public static void ExportAll(string exportDir, List<DataMessage> dataMessage)
         {
+            Dictionary<string, int> json = new Dictionary<string, int>();
+
             foreach (DataMessage data in dataMessage)
             {
                 string file = $"{data.Name}.txt";
@@ -78,9 +80,13 @@ namespace D3_Sqex03DataMessage
                     }
                 }
 
+                json.Add(data.Name, data.Strings.Count);
                 string content = String.Join("\r\n", messages.ToArray());
                 File.WriteAllText(filePath, content);
             }
+
+            string jsonSerializer = JsonConvert.SerializeObject(json);
+            File.WriteAllText(Path.Combine(exportDir, "export.json"), jsonSerializer);
         }
 
         public static void ImportFromJSON(string jsonFile, List<DataMessage> dataMessages)
