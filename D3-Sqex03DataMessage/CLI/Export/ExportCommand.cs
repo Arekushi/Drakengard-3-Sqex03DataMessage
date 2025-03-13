@@ -2,19 +2,26 @@
 
 namespace D3_Sqex03DataMessage.CLI.Export
 {
-    public class ExportCommand
+    public class ExportCommand : BaseCommand<ExportOptions>
     {
-        public void Export(string sourcePath, string destinationPath, bool oneFile = true)
+        public ExportCommand()
         {
-            List<DataMessage> dataMessages = Operation.Decrypt(sourcePath);
+            validators = [
+                new ExportCommandValidator()
+            ];
+        }
 
-            if (oneFile)
+        protected override void Execute(ExportOptions options)
+        {
+            List<DataMessage> dataMessages = Operation.Decrypt(options.SourcePath);
+
+            if (options.OneFile)
             {
-                Operation.ExportAllOneFile(destinationPath, dataMessages);
+                Operation.ExportAllOneFile(options.DestinationPath, dataMessages);
             }
             else
             {
-                Operation.ExportAll(destinationPath, dataMessages);
+                Operation.ExportAll(options.DestinationPath, dataMessages);
             }
         }
     }

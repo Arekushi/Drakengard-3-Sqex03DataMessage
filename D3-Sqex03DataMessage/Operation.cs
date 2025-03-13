@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using D3_Sqex03DataMessage.CLI.Repack;
 using Newtonsoft.Json;
 
 namespace D3_Sqex03DataMessage
@@ -10,7 +11,8 @@ namespace D3_Sqex03DataMessage
     {
         public static List<DataMessage> Decrypt(string gameDir)
         {
-            List<DataMessage> result = new List<DataMessage>();
+            List<DataMessage> result = [];
+
             string[] archives = Directory
                     .GetFiles(gameDir, "*.XXX", SearchOption.AllDirectories)
                     .Where(file => ArchiveConfig.ArchiveName.Contains(Path.GetFileName(file))).ToArray();
@@ -32,11 +34,11 @@ namespace D3_Sqex03DataMessage
 
         public static void ExportAllOneFile(string exportDir, List<DataMessage> dataMessage)
         {
-            Dictionary<string, int> json = new Dictionary<string, int>();
-            List<string> content = new List<string>();
+            Dictionary<string, int> json = [];
+            List<string> content = [];
             foreach (DataMessage data in dataMessage)
             {
-                List<string> messages = new List<string>();
+                List<string> messages = [];
                 if (data.Speakers == null)
                 {
                     messages = data.Strings;
@@ -53,20 +55,20 @@ namespace D3_Sqex03DataMessage
                 json.Add(data.Name, data.Strings.Count);
             }
 
-            File.WriteAllText($"{exportDir}\\Sqex03DataMessage.txt", String.Join("\r\n", content.ToArray()));
+            File.WriteAllText($"{exportDir}\\sqex-03-data-message.txt", String.Join("\r\n", content.ToArray()));
             string jsonSerializer = JsonConvert.SerializeObject(json);
-            File.WriteAllText(Path.Combine(exportDir, "export.json"), jsonSerializer);
+            File.WriteAllText(Path.Combine(exportDir, "_export.json"), jsonSerializer);
         }
 
         public static void ExportAll(string exportDir, List<DataMessage> dataMessage)
         {
-            Dictionary<string, int> json = new Dictionary<string, int>();
+            Dictionary<string, int> json = [];
 
             foreach (DataMessage data in dataMessage)
             {
                 string file = $"{data.Name}.txt";
                 string filePath = Path.Combine(exportDir, file);
-                List<string> messages = new List<string>();
+                List<string> messages = [];
 
                 if (data.Speakers == null)
                 {
@@ -81,18 +83,17 @@ namespace D3_Sqex03DataMessage
                 }
 
                 json.Add(data.Name, data.Strings.Count);
-                string content = String.Join("\r\n", messages.ToArray());
+                string content = string.Join("\r\n", messages.ToArray());
                 File.WriteAllText(filePath, content);
             }
 
             string jsonSerializer = JsonConvert.SerializeObject(json);
-            File.WriteAllText(Path.Combine(exportDir, "export.json"), jsonSerializer);
+            File.WriteAllText(Path.Combine(exportDir, "_export.json"), jsonSerializer);
         }
 
-        public static void ImportFromJSON(string jsonFile, List<DataMessage> dataMessages)
+        public static void ImportFromJSON(string jsonFile, string[] content, List<DataMessage> dataMessages)
         {
-            var exportJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(jsonFile));
-            string[] strings = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(jsonFile), "Sqex03DataMessage.txt"));
+            var exportJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(jsonFile));               
             int line = 0;
 
             foreach (KeyValuePair<string, string> entry in exportJson)
@@ -104,12 +105,12 @@ namespace D3_Sqex03DataMessage
 
                 for (int i = start; i < line; i++, index++)
                 {
-                    if (strings[i].Contains("{#Name="))
+                    if (content[i].Contains("{#Name="))
                     {
-                        strings[i] = strings[i].Split(new string[] { "{#Name=" }, StringSplitOptions.None).First();
+                        content[i] = content[i].Split(["{#Name="], StringSplitOptions.None).First();
                     }
 
-                    data.Strings[index] = strings[i];
+                    data.Strings[index] = content[i];
                 }
             }
         }

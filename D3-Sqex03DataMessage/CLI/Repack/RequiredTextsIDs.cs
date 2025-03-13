@@ -4,10 +4,10 @@ using System.IO;
 
 namespace D3_Sqex03DataMessage.CLI.Repack
 {
-    public class RequiredJsonFields
+    public class RequiredTextsIDs
     {
-        public static readonly List<string> REQUIRED_JSON_ATTRIBUTES = new List<string>
-        {
+        public static readonly List<string> REQUIRED_TEXTS_IDS =
+        [
             "Ability", "Ability_Name", "battle", "book", "boss_hint", "boss_hint_Name", "C_00", "C_00_Name",
             "C_1011", "C_1011_Name", "C_1021", "C_1021_Name", "C_1311", "C_1311_Name", "C_1411", "C_1411_Name",
             "C_2011", "C_2011_Name", "C_2021", "C_2021_Name", "C_2041", "C_2041_Name", "C_2311", "C_2311_Name",
@@ -34,14 +34,14 @@ namespace D3_Sqex03DataMessage.CLI.Repack
             "misson_outline", "monster_name", "Option", "pausemenu", "ppm00", "ppm00_Name", "quest", "quest_Name",
             "Quest_clear_conditions", "Result", "SELECT_MENU", "staffrollmsg", "story_outline", "title_menu", "Tutorial",
             "Weapon", "Weapon_Name", "weapon_effect", "weapon_story", "weapon_story_Name"
-        };
+        ];
 
-        public static (bool, List<string>) ValidateJsonAttributes(string jsonFilePath)
+        public static List<string> ValidateJsonAttributes(string jsonFilePath)
         {
             JObject jsonObject = JObject.Parse(File.ReadAllText(jsonFilePath));
-            List<string> missingAttributes = new List<string>();
+            List<string> missingAttributes = [];
 
-            foreach (var attribute in REQUIRED_JSON_ATTRIBUTES)
+            foreach (var attribute in REQUIRED_TEXTS_IDS)
             {
                 if (jsonObject[attribute] == null)
                 {
@@ -49,8 +49,22 @@ namespace D3_Sqex03DataMessage.CLI.Repack
                 }
             }
 
-            bool success = missingAttributes.Count == 0;
-            return (success, missingAttributes);
+            return missingAttributes;
+        }
+
+        public static List<string> ValidateTxtFiles(List<string> filesNames)
+        {
+            List<string> missingFiles = [];
+
+            foreach (string textID in REQUIRED_TEXTS_IDS)
+            {
+                if (!filesNames.Contains(textID))
+                {
+                    missingFiles.Add(textID);
+                }
+            }
+
+            return missingFiles;
         }
     }
 }
